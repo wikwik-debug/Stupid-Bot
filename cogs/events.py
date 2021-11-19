@@ -1,0 +1,101 @@
+import discord
+from discord.ext.commands import Cog
+from discord.ext import commands
+import json
+from discord.utils import find
+
+class Events(Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @Cog.listener()
+    async def on_ready(self):
+        print('Bot is ready.')
+
+
+    @Cog.listener()
+    async def on_guild_join(self, guild):
+        with open("prefixes.json", "r") as f:
+            prefixes = json.load(f)
+
+        prefixes[str(guild.id)] = "b!"
+
+        with open("prefixes.json", "w") as f:
+            json.dump(prefixes, f, indent = 4)
+
+        general = find(lambda x : x.name == 'general',  guild.text_channels)
+        chat = find(lambda x : x.name == "chat", guild.text_channels)
+
+        if general and general.permissions_for(guild.me).send_messages:
+            await general.send("Thank you for inviting me!")
+
+        elif chat and chat.permissions_for(guild.me).send_messages:
+            await chat.send("Thank you for inviting me!")
+  
+    @Cog.listener() 
+    async def on_guild_remove(self, guild):
+        with open("prefixes.json", "r") as f:
+            prefixes = json.load(f)
+
+        prefixes.pop(str(guild.id))
+
+        with open("prefixes.json", "w") as f:
+            json.dump(prefixes, f, indent = 4)
+  
+    @Cog.listener()
+    async def on_member_join(self, member):
+        guild = self.bot.get_guild(900562030723993631)
+        channel = self.bot.get_channel(900562030723993634)
+        await channel.send(f"Welcome to the server {member.mention} ! :partying_face:")
+        await member.send(f"Welcome to the **{guild.name}** server, {member.mention}! :partying_face:")
+  
+    @Cog.listener()
+    async def on_message(self, message):
+
+        mention = f'<@!{self.bot.user.id}>'
+    
+        if message.content == mention:
+            with open('prefixes.json', 'r') as f:
+                prefixes = json.load(f) 
+        
+            serverPrefix = prefixes[str(message.guild.id)]
+        
+            await message.channel.send(f"My prefix for this server is `{serverPrefix}`")
+    
+        if message.content == "Noob":
+            await message.reply("Your the only noob on this planet")
+    
+        mentionHelp = f'<@!{self.bot.user.id}> help'
+
+        if message.content == mentionHelp:
+            embed = discord.Embed(title = "My list of commands", colour = 0xffffff)
+            embed.add_field(name = "Moderation Commands", value = "``ban`` ``unban`` ``kick`` ``slowmode`` ``nickname`` ``mute`` ``unmute`` ``purge`` ``lock`` ``unlock`` ``channelban``", inline = False)
+            embed.add_field(name = "Info Commands", value = "``userinfo`` ``serverinfo`` ``botinfo`` ``covid`` ``emojiinfo`` ``numberinfo``", inline = False)
+            embed.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say``", inline = False)
+            embed.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle``", inline = False)
+
+            await message.channel.send(embed = embed)
+
+        else:
+            return
+
+
+    @Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error,commands.MissingPermissions):
+            await ctx.message.add_reaction("<a:DeniedBox:882782174208749608>")
+    
+        elif isinstance(error,commands.MissingRequiredArgument):
+            await ctx.message.add_reaction("<a:DeniedBox:882782174208749608>")
+        
+        elif isinstance(error,commands.CommandNotFound):
+            await ctx.reply("Invalid command, type it right next time!")
+        
+        elif isinstance(error, commands.DisabledCommand):
+            await ctx.reply("That command is disabled")
+
+        else:
+            raise error
+
+def setup(bot):
+  bot.add_cog(Events(bot))
