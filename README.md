@@ -1,1 +1,1 @@
-<h1 align=center>Stupid bot</h1>
+<h1 align=center>🤖Stupid bot🤖</h1>
