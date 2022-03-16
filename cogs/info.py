@@ -1,12 +1,17 @@
 import discord
-from discord import Guild as guild
-from discord import PublicUserFlags
+# from discord import Guild as guild
+# from discord import PublicUserFlags
 from discord.ext import commands
 import requests
 import json
 import datetime
 import phonenumbers
 from phonenumbers import carrier, geocoder, timezone
+import os
+
+
+from main import configure
+from weather import parse_data
 
 class Info(commands.Cog):
   
@@ -21,6 +26,7 @@ class Info(commands.Cog):
     embed.add_field(name = "Info Commands", value = "``whois`` ``serverinfo`` ``botinfo`` ``covid`` ``emojiinfo`` ``numberinfo``", inline = False)
     embed.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say``", inline = False)
     embed.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle``", inline = False)
+    embed.add_field(name = "Miscellaneous Commands", value = "``run``", inline = False)
 
     await ctx.send(embed = embed)
   
@@ -87,7 +93,6 @@ class Info(commands.Cog):
     embed.add_field(name="Server Description", value=f'`{(ctx.guild.description)}`', inline=False)
     embed.add_field(name="Server Owner", value=f'`{ctx.guild.owner}`', inline=False)
     embed.add_field(name="Verify Level", value=f'`{ctx.guild.verification_level}`', inline=False)
-    embed.add_field(name="Region", value=f'`{ctx.guild.region}`')
     embed.add_field(name="Server Boost Level", value=f'`{ctx.guild.premium_tier}`', inline=False)
     embed.add_field(name="Server Boost Role", value=f'`{ctx.guild.premium_subscriber_role}`', inline=False)
     embed.add_field(name="Highest Role", value=f'`{ctx.guild.roles[-1]}`', inline=False)
@@ -95,16 +100,22 @@ class Info(commands.Cog):
     embed.add_field(name="Total Members", value=f'`{ctx.guild.member_count}`', inline=False)
     embed.add_field(name="Total Channels", value=f'`{len(ctx.guild.channels)}`', inline=False)
     embed.add_field(name="Total Categories", value=f'`{len(ctx.guild.categories)}`', inline=False)
-    embed.add_field(name="The server was created at", value=f'`{ctx.guild.created_at.strftime("%a, %d %B %Y, %I:%M %P UTC")}`', inline=False)
+    embed.add_field(name="The server was created at", value=f'`{ctx.guild.created_at.strftime("%m/%d/%Y, %H:%M:%S")}`', inline=False)
 
 
     await ctx.send(embed=embed)
+    print(ctx.guild.filesize_limit)
   
   #The whois command
   @commands.command()
   async def whois(self, ctx, member: discord.Member = None):
 
     member = ctx.author if not member else member
+
+    if member == "me":
+      member = ctx.author
+    else:
+      member
     
     roles = [role.mention for role in member.roles[::-1]]
     roles.pop()
@@ -124,8 +135,8 @@ class Info(commands.Cog):
     embed.add_field(name="User's status", value=f"``{member.status}``", inline=False)
     embed.add_field(name = "User's activity", value = f"``{member.activity}``", inline = False)
 
-    embed.add_field(name="Created at:", value = f"``{member.created_at.strftime('%a, %d %B %Y, %I:%M %P UTC')}``", inline=True)
-    embed.add_field(name="Joined the server at:", value = f"``{member.joined_at.strftime('%a, %d %B %Y, %I:%M %P UTC')}``", inline=False)
+    embed.add_field(name="Created at:", value = f"``{member.created_at.strftime('%m/%d/%Y, %H:%M:%S')}``", inline=True)
+    embed.add_field(name="Joined the server at:", value = f"``{member.joined_at.strftime('%m/%d/%Y, %H:%M:%S')}``", inline=False)
 
     embed.add_field(name=f'Roles ({len(member.roles[::-1])})', value =" ".join(roles), inline=False)
 
@@ -149,7 +160,7 @@ class Info(commands.Cog):
     is_managed = "Yes" if emoji.managed else "No"
     is_animated = "Yes" if emoji.animated else "No"
     require_colons = "Yes" if emoji.require_colons else "No"
-    creation_time = emoji.created_at.strftime('%a, %d %B %Y, %I:%M %P UTC')
+    creation_time = emoji.created_at.strftime("%m/%d/%Y, %H:%M:%S")
     can_use_emoji = "Everyone" if not emoji.roles else " ".join(role.name for role in emoji.roles[1:])
 
     description = f"""
@@ -178,6 +189,65 @@ class Info(commands.Cog):
     )
     emojiEmbed.set_thumbnail(url = emoji.url)
     await ctx.send(embed = emojiEmbed)
+  
+  #The numberinfo command
+  @commands.command(aliases = ["ni"])
+  async def numberinfo(self, ctx, number):
+    
+    number = phonenumbers.parse(number)
+
+    colour = discord.Colour
+
+    valid_number = "Yes" if phonenumbers.is_valid_number(number) else "No"
+
+    description = f"""
+    **- The carrier's number:** ``{carrier.name_for_number(number, "en")}``
+    **- The number's region:** ``{geocoder.description_for_number(number, "en")}``
+    **- Number's timezone:** ``{timezone.time_zones_for_number(number)}``
+    **- Valid phone number:** ``{valid_number}``
+    """
+
+    numEmbed = discord.Embed(
+      title = f"Phone number information for: `{phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.NATIONAL)}`",
+      description = description,
+      color = colour.random()
+    )
+
+    numEmbed.set_thumbnail(url = "https://cdn.discordapp.com/attachments/900644202453549076/908989593876054016/Goblok.png")
+
+    await ctx.send(embed = numEmbed)
+  
+  #The weather command
+  @commands.command()
+  async def weather(ctx, *, location):
+
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={location}&appid={os.getenv('API_KEY')}&units=imperial"
+    data = json.loads(requests.get(url).content)
+    data = parse_data(data)
+      
+    aliases = {
+      'temp': 'Temperature',
+      'temp_max': "Maximum Temperature",
+      "temp_min": "Minimum Temperature",
+      "feels_like": "Feels like",
+      "sea_level": "Sea level",
+      "grnd_level": "Ground level"
+    }
+      
+    colour = discord.Colour
+      
+    location = location.title()
+          
+    weatherEmbed = discord.Embed(
+      title = f"{location} weather",
+      description = f"Here is the data for {location}.",
+      colour = colour.random()
+    )
+
+    for key in data:
+      weatherEmbed.add_field(name = aliases[key], value = str(data[key]), inline = False)
+          
+    await ctx.send(embed = weatherEmbed)
 
 
 def setup(bot):

@@ -1,5 +1,7 @@
 import discord
+from discord import User
 from discord.ext import commands
+import asyncio
 
 class Moderation(commands.Cog):
   def __init__(self, bot):
@@ -55,6 +57,64 @@ class Moderation(commands.Cog):
   async def nickname(self, ctx, member: discord.Member, *, nick):
     await member.edit(nick=nick)
     await ctx.send(f'Nickname was changed for {member.mention} ')
+  
+  class DurationConverter(commands.Converter):
+    async def convert(self, ctx, argument):
+      amount = argument[:-1]
+      unit = argument[-1]
+
+      if amount.isdigit() and unit in ["h", "m", "s"]:
+        return (int(amount), unit)
+  
+  #The mute command
+  @commands.command()
+  @commands.has_permissions(manage_messages = True)
+  async def mute(self, ctx, member:discord.Member, duration: DurationConverter, reason = None):
+    role = discord.utils.get(ctx.guild.roles, name="Muted")
+    guild = ctx.guild
+
+
+    if role not in guild.roles:
+      perms = discord.Permissions(send_messages=False, speak=False)
+      
+      await guild.create_role(name="Muted", permissions=perms)
+        
+      multiplier = {"h": 60 * 60, "m": 60, "s": 1}
+      amount, unit = duration 
+
+      await member.add_roles(role)
+
+      embed = discord.Embed(
+        description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for {duration}",
+        color = 0x44b582
+      )
+
+      await ctx.send(embed = embed)
+      
+      await asyncio.sleep(amount * multiplier[unit])
+      
+      await member.remove_roles(role)
+    
+    elif reason == None:
+      await ctx.message.add_reaction("<a:DeniedBox:882782174208749608>") 
+    
+    else:
+      multiplier = {"h": 60 * 60, "m": 60, "s": 1}
+      amount, unit = duration 
+        
+      await member.add_roles(role)
+          
+      embed2 = discord.Embed(
+        description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for {duration}",
+        color = 0x44b582
+      )
+      
+      await ctx.send(embed = embed2)
+      
+      await asyncio.sleep(amount * multiplier[unit])
+      
+      await member.remove_roles(role)
+
 
   #The unmute command
   @commands.command()
@@ -81,7 +141,7 @@ class Moderation(commands.Cog):
   #The lock commmand
   @commands.command()
   @commands.has_permissions(manage_channels = True)
-  async def lock(self, ctx):
+  async def lock(self, ctx, *, channel):
     
     defaultRole = ctx.guild.default_role
     
