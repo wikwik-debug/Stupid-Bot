@@ -4,13 +4,15 @@ from discord.ext import commands
 import json
 from discord.utils import find
 
+# from main import bot
+
 class Events(Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @Cog.listener()
     async def on_ready(self):
-        print('Bot is ready.')
+        print('Bot is ready!')
 
 
     @Cog.listener()
@@ -89,7 +91,7 @@ class Events(Cog):
             await ctx.message.add_reaction("<a:DeniedBox:882782174208749608>")
         
         elif isinstance(error,commands.CommandNotFound):
-            await ctx.reply("Invalid command, type it right next time!")
+            await ctx.reply("Invalid command <a:DeniedBox:882782174208749608>")
         
         elif isinstance(error, commands.DisabledCommand):
             await ctx.reply("That command is disabled")

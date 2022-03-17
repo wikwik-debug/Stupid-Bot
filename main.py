@@ -55,20 +55,35 @@ async def clear(ctx, amount: int):
 
 @bot.command()
 async def salatiga(ctx):
-  await ctx.send("It is my dev's hometown")
+  message = await ctx.send("It is <@!727482301667213352>'s hometown")
+  await asyncio.sleep(5)
+  await message.edit(content="Tapi boong 😂 😂")
 
-@bot.command()
-async def load(ctx, extension):
-  bot.load_extension(f"cogs.{extension}")
-  await ctx.send(f"The ``{extension}`` cogs have been successfully loaded")
+# @bot.command()
+# async def load(ctx, extension):
+#   bot.load_extension(f"cogs.{extension}")
+#   await ctx.send(f"The ``{extension}`` cogs have been successfully loaded")
 
-@bot.command()
-async def unload(ctx, extension):
-  bot.unload_extension(f"cogs.{extension}")
-  await ctx.send(f"The ``{extension}`` cogs have been successfully unloaded")
+# @bot.command()
+# async def unload(ctx, extension):
+#   bot.unload_extension(f"cogs.{extension}")
+#   await ctx.send(f"The ``{extension}`` cogs have been successfully unloaded")
+
+# @bot.command()
+# async def check_cogs(ctx, extension):
+#     try:
+#         bot.load_extension(f"cogs.{extension}")
+#     except commands.ExtensionAlreadyLoaded:
+#         await ctx.send("Cog is loaded")
+#     except commands.ExtensionNotFound:
+#         await ctx.send("Cog not found")
+#     else:
+#         await ctx.send("Cog is unloaded")
+#         bot.unload_extension(f"cogs.{extension}")
 
 
 async def ch_pr():
+    
     await bot.wait_until_ready()
 
     botStatuses = ["bijaksana2000", 
