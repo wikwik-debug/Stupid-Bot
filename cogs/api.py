@@ -2,8 +2,12 @@ from discord.ext import commands
 from discord import Embed
 
 import requests
-from colour import Color
 import asyncio
+from dotenv import load_dotenv
+import os
+import json
+
+
 
 class Api(commands.Cog):
     def __init__(self, bot):
@@ -12,16 +16,18 @@ class Api(commands.Cog):
     @commands.cooldown(1, 30, commands.BucketType.user)
     @commands.command(aliases = ["ud"])
     async def userID(self, ctx, *, username):
-        url = "https://instagram47.p.rapidapi.com/get_user_id"
+        
+        with open("apiCogsConfig.json", "r") as file:
+            apiConfig = json.load(file)
 
         querystring = {"username":f"{username}"}
 
         headers = {
-            'x-rapidapi-host': "instagram47.p.rapidapi.com",
-            'x-rapidapi-key': "9f35c1fc25msh39b4a7825015512p1df884jsn6005f4bfce74"
+            'x-rapidapi-host': f"{apiConfig['1']}",
+            'x-rapidapi-key': f"{os.getenv('INSTAGRAM_KEY')}"
         }
 
-        response = requests.request("GET", url, headers=headers, params=querystring)
+        response = requests.request("GET", apiConfig["0"], headers=headers, params=querystring)
         responseJSON = response.json()
 
         description = f"""
@@ -30,9 +36,7 @@ class Api(commands.Cog):
         """
 
         # colour = discord.Colour
-        red = Color("red")
-        colors = list(red.range_to(Color("green"),10))
-
+        
         userIdInstragramEmbed = Embed(
             title = "Instragram User ID",
             description = description,
