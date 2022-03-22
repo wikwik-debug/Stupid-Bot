@@ -54,32 +54,52 @@ class Events(Cog):
     @Cog.listener()
     async def on_message(self, message):
 
-        mention = f'<@!{self.bot.user.id}>'
+        mentionForPC = f'<@!{self.bot.user.id}>'
+        mentionForMobile = f"<@881735007893336084>"
     
-        if message.content == mention:
-            with open('prefixes.json', 'r') as f:
-                prefixes = json.load(f) 
+        if message.content == mentionForPC:
+            with open('prefixes.json', 'r') as f1:
+                prefixes = json.load(f1) 
+        
+            serverPrefix = prefixes[str(message.guild.id)]
+        
+            await message.channel.send(f"My prefix for this server is `{serverPrefix}`")
+        
+        # For mobile compatibility
+        elif message.content == mentionForMobile:
+            with open('prefixes.json', 'r') as f2:
+                prefixes = json.load(f2) 
         
             serverPrefix = prefixes[str(message.guild.id)]
         
             await message.channel.send(f"My prefix for this server is `{serverPrefix}`")
     
-        if message.content == "Noob":
+        elif message.content == "Noob":
             await message.reply("Your the only noob on this planet")
     
-        mentionHelp = f'<@!{self.bot.user.id}> help'
+        mentionHelpForPC = f'<@!{self.bot.user.id}> help'
+        mentionHelpForMobile = f'<@881735007893336084> help'
 
-        if message.content == mentionHelp:
-            embed = discord.Embed(title = "My list of commands", colour = 0xffffff)
-            embed.add_field(name = "Moderation Commands", value = "``ban`` ``unban`` ``kick`` ``slowmode`` ``nickname`` ``mute`` ``unmute`` ``purge`` ``lock`` ``unlock`` ``channelban``", inline = False)
-            embed.add_field(name = "Info Commands", value = "``userinfo`` ``serverinfo`` ``botinfo`` ``covid`` ``emojiinfo`` ``numberinfo``", inline = False)
-            embed.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say``", inline = False)
-            embed.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle``", inline = False)
+        if message.content == mentionHelpForPC:
+            embed1 = discord.Embed(title = "My list of commands", colour = 0xffffff)
+            embed1.add_field(name = "Moderation Commands", value = "``ban`` ``unban`` ``kick`` ``slowmode`` ``nickname`` ``mute`` ``unmute`` ``purge`` ``lock`` ``unlock`` ``channelban``", inline = False)
+            embed1.add_field(name = "Info Commands", value = "``whois`` ``serverinfo`` ``botinfo`` ``covid`` ``emojiinfo`` ``numberinfo``", inline = False)
+            embed1.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say``", inline = False)
+            embed1.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle``", inline = False)
+            embed1.add_field(name = "Miscellaneous Commands", value = "``run``", inline = False)
 
-            await message.channel.send(embed = embed)
+            await message.channel.send(embed = embed1)
+        
+        # For mobile compatibility
+        elif message.content == mentionHelpForMobile:
+            embed2 = discord.Embed(title = "My list of commands", colour = 0xffffff)
+            embed2.add_field(name = "Moderation Commands", value = "``ban`` ``unban`` ``kick`` ``slowmode`` ``nickname`` ``mute`` ``unmute`` ``purge`` ``lock`` ``unlock`` ``channelban``", inline = False)
+            embed2.add_field(name = "Info Commands", value = "``whois`` ``serverinfo`` ``botinfo`` ``covid`` ``emojiinfo`` ``numberinfo``", inline = False)
+            embed2.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say``", inline = False)
+            embed2.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle``", inline = False)
+            embed2.add_field(name = "Miscellaneous Commands", value = "``run``", inline = False)
 
-        else:
-            return
+            await message.channel.send(embed = embed2)
 
 
     @Cog.listener()
