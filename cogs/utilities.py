@@ -14,7 +14,7 @@ class Utilities(commands.Cog):
     with open("prefixes.json", "r") as f:
       prefixes = json.load(f)
 
-    prefixes[str(ctx.guild.id)] = prefix
+    prefixes[f"{str(ctx.guild.name)}({str(ctx.guild.id)})"] = prefix
 
     with open("prefixes.json", "w") as f:
       json.dump(prefixes, f, indent = 4)

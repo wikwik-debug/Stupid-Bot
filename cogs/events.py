@@ -20,7 +20,7 @@ class Events(Cog):
         with open("prefixes.json", "r") as f:
             prefixes = json.load(f)
 
-        prefixes[str(guild.id)] = "b!"
+        prefixes[f"{str(guild.name)}({str(guild.id)})"] = "b!"
 
         with open("prefixes.json", "w") as f:
             json.dump(prefixes, f, indent = 4)
@@ -39,7 +39,7 @@ class Events(Cog):
         with open("prefixes.json", "r") as f:
             prefixes = json.load(f)
 
-        prefixes.pop(str(guild.id))
+        prefixes.pop(f"{str(guild.name)}({str(guild.id)})")
 
         with open("prefixes.json", "w") as f:
             json.dump(prefixes, f, indent = 4)
@@ -50,7 +50,7 @@ class Events(Cog):
         channel = self.bot.get_channel(900562030723993634)
         await channel.send(f"Welcome to the server {member.mention} ! :partying_face:")
         await member.send(f"Welcome to the **{guild.name}** server, {member.mention}! :partying_face:")
-  
+
     @Cog.listener()
     async def on_message(self, message):
 
@@ -61,7 +61,7 @@ class Events(Cog):
             with open('prefixes.json', 'r') as f1:
                 prefixes = json.load(f1) 
         
-            serverPrefix = prefixes[str(message.guild.id)]
+            serverPrefix = prefixes[f"{str(message.guild.name)}({str(message.guild.id)})"]
         
             await message.channel.send(f"My prefix for this server is `{serverPrefix}`")
         
@@ -70,7 +70,7 @@ class Events(Cog):
             with open('prefixes.json', 'r') as f2:
                 prefixes = json.load(f2) 
         
-            serverPrefix = prefixes[str(message.guild.id)]
+            serverPrefix = prefixes[f"{str(message.guild.name)}({str(message.guild.id)})"]
         
             await message.channel.send(f"My prefix for this server is `{serverPrefix}`")
     

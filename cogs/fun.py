@@ -1,7 +1,11 @@
+import json
 import discord
+from discord import Member
 from discord.ext import commands
+
 import random
 import aiohttp
+import requests
 
 class Fun(commands.Cog):
 
@@ -39,8 +43,13 @@ class Fun(commands.Cog):
   @commands.command()
   async def meme(self, ctx: commands.Context):
     async with aiohttp.ClientSession() as session:
-      async with session.get("https://www.reddit.com/r/memes/hot.json") as resp:
+      # listOfUrls = ["https://www.reddit.com/r/memes/hot.json", "https://www.reddit.com/r/dankmemes/top.json?t=all"]
+      
+      # randomChoiceUrl = random.choice(listOfUrls)
+      
+      async with session.get("https://www.reddit.com/r/dankmemes/hot.json?t=all") as resp:
         data = await resp.json()
+        print(data)
         data = data["data"]
         children = data["children"]
         post = random.choice(children)["data"]
@@ -111,6 +120,18 @@ class Fun(commands.Cog):
     
     await ctx.send(''.join(emojis))
   
+  @commands.command()
+  async def tweet(self, ctx, *, message, member: discord.Member = None):
+    member = ctx.author if not member else member
+    
+    url = f"https://nekobot.xyz/api/imagegen?type=tweet&username={member.name}&text={message}"
+      
+    response = requests.get(url)
+      
+    data = json.loads(response.text)
+      
+    await ctx.send(data["message"])
+
   @commands.command()
   async def say(self, ctx, *, message):
     await ctx.send(message)

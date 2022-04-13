@@ -1,4 +1,6 @@
+from pydoc import describe
 import discord
+from discord import Embed, AuditLogAction, Guild
 from discord.ext import commands
 # from discord import app_commands
 from discord_slash import SlashCommand
@@ -6,14 +8,7 @@ from discord_slash import SlashCommand
 
 import json
 from time import time
-import contextlib
-import io
-from traceback import format_exception
-import textwrap
 import asyncio
-import phonenumbers
-from phonenumbers import carrier, geocoder, timezone
-from weather import parse_data
 import requests
 import random
 from dotenv import load_dotenv
@@ -22,7 +17,7 @@ import os
 def get_prefix(bot, message):
     with open("prefixes.json", "r") as f:
       prefixes = json.load(f)
-    return prefixes[str(message.guild.id)]
+    return prefixes[f"{str(message.guild.name)}({str(message.guild.id)})"]
 
 def configure():
   load_dotenv()
@@ -33,7 +28,7 @@ bot = commands.Bot(command_prefix=get_prefix, intents=intents)
 bot.remove_command("help")
 slash = SlashCommand(bot, sync_commands=True)
 
-guild_id = [900562030723993631, 896429122358739034]
+guild_id = [900562030723993631, 896429122358739034, 929595596413747261]
 
 @slash.slash(name = "Ping", description = "Get the latency of the bot" , guild_ids = guild_id)
 async def ping(ctx):
@@ -48,9 +43,9 @@ async def clear(ctx, amount: int):
 
   await ctx.channel.purge(limit = amount)
 
-  await message.delete()
-  
   message = await ctx.send("Done!")
+
+  await message.delete()
 
 
 @bot.command()
@@ -58,6 +53,142 @@ async def salatiga(ctx):
   message = await ctx.send("It is <@!727482301667213352>'s hometown")
   await asyncio.sleep(5)
   await message.edit(content="Tapi boong 😂 😂")
+
+@bot.command()
+async def nsfw(ctx, type = None):
+
+  if type == "food":
+    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
+  elif type == "coffee":
+    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
+  elif type == "kanna":
+    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
+  elif type == "neko":
+    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
+  elif type == "holo":
+    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
+  elif type == "kemonomimi":
+    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
+  elif type == "gah":
+    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
+  elif type == "tentacle":
+    await ctx.send("This type is blacklisted from the command")
+  elif type == "yaoi":
+    await ctx.send("This type is blacklisted from the command\nReason: Homosexual")
+  elif type == "porngif":
+    urlType = f"https://nekobot.xyz/api/image?type=pgif"
+    
+    responseType = requests.get(urlType)
+    
+    dataType = json.loads(responseType.text)
+    
+    responseEmbedType = Embed(
+      url = dataType["message"],
+      title = "<:NSFW:962289749954027571> Pgif",
+      color = 0xffffff
+    )
+    
+    urlTypeEmbed = dataType["message"]
+    
+    responseEmbedType.set_image(url=urlTypeEmbed)
+    
+    responseEmbedType.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+    
+    await ctx.send(embed = responseEmbedType)
+  elif type == None:
+      typeEmbed = Embed(
+        title="List of available types:",
+        description = """
+        - hass
+        - hmidriff
+        - pgif
+        - 4k
+        - hentai
+        - hneko
+        - hkitsune
+        - anal
+        - hanal
+        - gonewild
+        - ass
+        - pussy
+        - thigh
+        - hthigh
+        - paizuri
+        - boobs
+        - hboobs
+        """
+      )
+
+      await ctx.send(embed = typeEmbed)
+  else:
+    url = f"https://nekobot.xyz/api/image?type={type}"
+    
+    response = requests.get(url)
+    
+    data = json.loads(response.text)
+    
+    if data["message"] == "Unknown Image Type":
+      message = await ctx.reply("Invalid type!")
+      
+      await asyncio.sleep(5)
+      
+      await message.delete()
+      
+      validEmbed = Embed(
+        title="Current Valid types:",
+        description = """
+        - hass
+        - hmidriff
+        - pgif
+        - 4k
+        - hentai
+        - hneko
+        - hkitsune
+        - anal
+        - hanal
+        - gonewild
+        - ass
+        - pussy
+        - thigh
+        - hthigh
+        - paizuri
+        - boobs
+        - hboobs
+        """
+      )
+      
+      await ctx.reply(embed=validEmbed)
+    else:
+      responseEmbed = Embed(
+        url = data["message"],
+        title=f"<:NSFW:962289749954027571> {type.capitalize()}",
+        color = 0xffffff
+      )
+      if data["message"].endswith(".gif"):
+        await ctx.send("https://tenor.com/view/mods-he-posted-nsfw-gif-23166437")
+      else:
+        url = data["message"]
+        
+        responseEmbed.set_image(url=url)
+        
+        responseEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+        
+        await ctx.send(embed = responseEmbed)
+
+async def save_audit_logs(guild):
+  with open(f'audit_logs_{guild.name}.txt', 'w+') as f:
+    async for entry in guild.audit_logs(limit=100):
+      f.writelines(f'- {entry.user} did {entry.action} to {entry.target}\n')
+
+@bot.command()
+async def test(ctx):
+  url = "http://api.oboobs.ru/boobs/1/20000"
+  response = requests.get(url)
+  data = json.loads(response.text)
+  print(data["preview"])
+  
+
+
 
 # @bot.command()
 # async def load(ctx, extension):
@@ -83,29 +214,30 @@ async def salatiga(ctx):
 
 
 async def ch_pr():
-    
-    await bot.wait_until_ready()
+  
+  await bot.wait_until_ready()
 
-    botStatuses = ["bijaksana2000", 
-                   "discord.py", 
-                   "You're mom", 
-                   "Am pro",
-                   "Simon Says",
-                   "everything's go wrong",
-                   f"{len(bot.guilds)} server's | b!help",
-                   "Mr. Denjayu is a simp",
-                   "Happy birthday Daniel"
-                  ]
+  botStatuses = [
+    "bijaksana2000",
+    "discord.py",
+    "You're mom",
+    "Am pro",
+    "Simon Says",
+    "everything's go wrong",
+    f"{len(bot.guilds)} server's | b!help",
+    "Mr. Denjayu is a simp",
+    "Happy birthday Daniel"
+  ]
 
-    activityType = [discord.ActivityType.watching, discord.ActivityType.streaming, discord.ActivityType.playing, discord.ActivityType.listening, discord.ActivityType.competing]
+  activityType = [discord.ActivityType.watching, discord.ActivityType.streaming, discord.ActivityType.playing, discord.ActivityType.listening, discord.ActivityType.competing]
 
-    while not bot.is_closed():
-        botStatus = random.choice(botStatuses)
-        botStatusType = random.choice(activityType)
+  while not bot.is_closed():
+      botStatus = random.choice(botStatuses)
+      botStatusType = random.choice(activityType)
 
-        await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type = botStatusType, name = botStatus))
+      await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type = botStatusType, name = botStatus))
 
-        await asyncio.sleep(25)
+      await asyncio.sleep(25)
 
 for filename in os.listdir("./cogs"):
   if filename.endswith(".py"):

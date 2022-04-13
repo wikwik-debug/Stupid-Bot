@@ -111,11 +111,6 @@ class Info(commands.Cog):
   async def whois(self, ctx, member: discord.Member = None):
 
     member = ctx.author if not member else member
-
-    if member == "me":
-      member = ctx.author
-    else:
-      member
     
     roles = [role.mention for role in member.roles[::-1]]
     roles.pop()
