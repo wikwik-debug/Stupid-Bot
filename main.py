@@ -1,5 +1,3 @@
-from pydoc import describe
-from threading import _profile_hook
 import discord
 from discord import Embed, AuditLogAction, Guild
 from discord.ext import commands
@@ -195,8 +193,21 @@ async def guild(ctx):
     await ctx.send(f"Server ID: {i.id}\nServer Name: {i.name}\nMember Count: {i.member_count}\n\n")
 
 @bot.command()
-async def print(ctx, *, message):
-  print(message)
+async def catgif(ctx):
+  url = "https://api.thecatapi.com/v1/images/search?mime_types=gif"
+  header = {
+    "x-api-key": os.getenv("CAT_KEY")
+  }
+  response = requests.get(url, headers=header)
+  data = json.loads(response.text)
+  await ctx.send(data[0]["url"])
+
+@bot.command()
+async def dog(ctx):
+  url = "https://dog.ceo/api/breeds/image/random"
+  response = requests.get(url)
+  data = json.loads(response.text)
+  await ctx.send(data["message"])
 
 
 

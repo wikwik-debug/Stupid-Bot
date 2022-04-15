@@ -1,5 +1,5 @@
 import discord
-from discord import User
+from discord import User, AppInfo
 from discord.ext import commands
 import asyncio
 from time import time
@@ -22,18 +22,20 @@ class Bot(commands.Cog):
   #The botinfo command
   @commands.command(aliases = ["bot", "bi"])
   async def botinfo(self, ctx):
+    appinfo = await self.bot.application_info()
+    
     botInfoEmbed = discord.Embed(
       color = 0xffffff
     )
-    botInfoEmbed.set_author(name= "Stupid Bot", icon_url="https://cdn.discordapp.com/avatars/881735007893336084/83080f50240798459dfc45a6b60ab746.png?size=128")
-    
+    botInfoEmbed.set_author(name= "Stupid Bot", icon_url=appinfo.icon_url)
+    # https://cdn.discordapp.com/avatars/881735007893336084/83080f50240798459dfc45a6b60ab746.png?size=128
     botInfoEmbed.add_field(name = "Version <a:Info:903501224014385192>", value = "1.0.0")
     botInfoEmbed.add_field(name = "Libary <:Python:903496492256473118>", value = "Discord.py")
-    botInfoEmbed.add_field(name = "Creator <:Bot_owner:903494195975684127> <:Bot_dev:903502947290333245>", value = "username#2575")
+    botInfoEmbed.add_field(name = "Creator <:Bot_owner:903494195975684127> <:Bot_dev:903502947290333245>", value = appinfo.owner)
     botInfoEmbed.add_field(name = "Servers <:Servers:903501984273932298>", value= len(self.bot.guilds))
     botInfoEmbed.add_field(name = "Users <:Person:903497301828444181>", value = len(self.bot.users))
-    botInfoEmbed.add_field(name = "Invite link ✉", value="https://bit.ly/3mU5zSm")
-    botInfoEmbed.add_field(name = "This bot was created at:", value = self.bot.user.created_at.strftime("%m/%d/%Y, %H:%M:%S UTC"), inline=False)
+    botInfoEmbed.add_field(name = "Invite link ✉", value="https://dsc.gg/stupid-bot")
+    botInfoEmbed.add_field(name = "This bot was created at:", value = f'{self.bot.user.created_at.strftime("%m/%d/%Y, %H:%M:%S UTC")} (<t:1630335607:R>)', inline=False)
 
     await ctx.send(embed = botInfoEmbed)
 
