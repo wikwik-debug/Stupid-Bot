@@ -11,16 +11,19 @@ class Moderation(commands.Cog):
   @commands.command(case_insective = True)
   @commands.has_permissions(kick_members = True)
   async def kick(self, ctx, member : discord.Member, *, reason=None):
-    embed = Embed(
-      description = f"You have been kicked from {ctx.guild.name}",
-      color = 0xff0000
-    )
+    if reason is None:
+      await ctx.reply("Please provide a reason")
+    else:
+      kickEmbed = Embed(
+        description = f"You have been kicked from {ctx.guild.name}\nReason: {reason}",
+        color = 0xff0000
+      )
 
-    await member.send(embed = embed)
-  
-    await member.kick(reason=reason)
-  
-    await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
+      await member.send(embed = kickEmbed)
+    
+      await member.kick(reason=reason)
+    
+      await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
   
   #The ban command
   @commands.command()
