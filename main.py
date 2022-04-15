@@ -194,6 +194,10 @@ async def guild(ctx):
   for i in bot.guilds:
     await ctx.send(f"Server ID: {i.id}\nServer Name: {i.name}\nMember Count: {i.member_count}\n\n")
 
+@bot.command()
+async def print(ctx, *, message):
+  print(message)
+
 
 
 # @bot.command()
