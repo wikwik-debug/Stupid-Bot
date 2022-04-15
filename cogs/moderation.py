@@ -1,5 +1,5 @@
 import discord
-from discord import User
+from discord import TextChannel, User, Embed
 from discord.ext import commands
 import asyncio
 
@@ -11,7 +11,7 @@ class Moderation(commands.Cog):
   @commands.command(case_insective = True)
   @commands.has_permissions(kick_members = True)
   async def kick(self, ctx, member : discord.Member, *, reason=None):
-    embed = discord.Embed(
+    embed = Embed(
       description = f"You have been kicked from {ctx.guild.name}",
       color = 0xff0000
     )
@@ -32,17 +32,10 @@ class Moderation(commands.Cog):
   #The unban command
   @commands.command()
   @commands.has_permissions(ban_members = True)
-  async def unban(self, ctx, *, member):
-    banned_users = await ctx.guild.bans()
-    member_name, member_discriminator = member.split('#')
-  
-    for ban_entry in banned_users:
-      user = ban_entry.user
-
-      if (user.name, user.discriminator) == (member_name, member_discriminator):
-        await ctx.guild.unban(user)
-        await ctx.message.add_reaction("")
-        return
+  async def unban(self, ctx, user: User):
+    bannedUser = await self.bot.fetch_user(user.id)
+    await ctx.guild.unban(bannedUser)
+    await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
   
   #The clear command
   @commands.command()
@@ -65,7 +58,7 @@ class Moderation(commands.Cog):
 
       if amount.isdigit() and unit in ["h", "m", "s"]:
         return (int(amount), unit)
-  
+
   #The mute command
   @commands.command()
   @commands.has_permissions(manage_messages = True)
@@ -79,13 +72,13 @@ class Moderation(commands.Cog):
       
       await guild.create_role(name="Muted", permissions=perms)
         
-      multiplier = {"h": 60 * 60, "m": 60, "s": 1}
+      multiplier = {"d": 86400, "h": 3600, "m": 60, "s": 1}
       amount, unit = duration 
 
       await member.add_roles(role)
 
-      embed = discord.Embed(
-        description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for {duration}",
+      embed = Embed(
+        description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for {amount}{unit}",
         color = 0x44b582
       )
 
@@ -95,17 +88,17 @@ class Moderation(commands.Cog):
       
       await member.remove_roles(role)
     
-    elif reason == None:
+    elif reason is None:
       await ctx.message.add_reaction("<a:DeniedBox:882782174208749608>") 
     
     else:
-      multiplier = {"h": 60 * 60, "m": 60, "s": 1}
+      multiplier = {"d": 86400, "h": 3600, "m": 60, "s": 1}
       amount, unit = duration 
         
       await member.add_roles(role)
           
-      embed2 = discord.Embed(
-        description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for {duration}",
+      embed2 = Embed(
+        description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for {amount}{unit}",
         color = 0x44b582
       )
       
@@ -124,7 +117,7 @@ class Moderation(commands.Cog):
     
     await member.remove_roles(role)
 
-    embed3 = discord.Embed(
+    embed3 = Embed(
           description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been unmuted",
           color = 0x44b582
         )
@@ -141,22 +134,26 @@ class Moderation(commands.Cog):
   #The lock commmand
   @commands.command()
   @commands.has_permissions(manage_channels = True)
-  async def lock(self, ctx, *, channel):
-    
+  async def lock(self, ctx, channelName: TextChannel):
+    channel = await self.bot.fetch_channel(channelName.id)
+
     defaultRole = ctx.guild.default_role
     
     overwrite = discord.PermissionOverwrite()
     
     overwrite.send_messages = False
+    overwrite.use_slash_commands = False
     
-    await ctx.channel.set_permissions(defaultRole, overwrite=overwrite)
+    await channel.set_permissions(defaultRole, overwrite=overwrite)
     
-    await ctx.send(f"{ctx.channel.mention} have been successfully locked")
+    await ctx.send(f"{channel.mention} have been successfully locked")
   
   #The unlock command
   @commands.command()
   @commands.has_permissions(manage_channels = True)
-  async def unlock(self, ctx):
+  async def unlock(self, ctx, channelName: TextChannel):
+
+    channel = await self.bot.fetch_channel(channelName.id)
     
     defaultRole = ctx.guild.default_role
 
@@ -164,20 +161,21 @@ class Moderation(commands.Cog):
     
     overwrite.send_messages = True
     
-    await ctx.channel.set_permissions(defaultRole, overwrite=overwrite)
+    await channel.set_permissions(defaultRole, overwrite=overwrite)
     
-    await ctx.send(f"{ctx.channel.mention} have been successfully unlocked")
+    await ctx.send(f"{channel.mention} have been successfully unlocked")
   
   #The channelban command
   @commands.command(aliases = ["cb"])
+  @commands.has_permissions(ban_members = True)
   async def channelban(self, ctx, member: discord.Member, reason = None):
     
     overwrite = discord.PermissionOverwrite()
     
     overwrite.view_channel = False
     
-    if reason == None:
-      return await ctx.send("Please provide a reason")
+    if reason is None:
+      return await ctx.reply("Please provide a reason")
     
     await ctx.channel.set_permissions(member, overwrite=overwrite)
     
@@ -187,7 +185,8 @@ class Moderation(commands.Cog):
   async def random(self, ctx):
     colour = discord.Colour
     
-    randomEmbed = discord.Embed(
+    randomEmbed = Embed(
+      title = "random",
       description = "This is random",
       color = colour.random()
     )

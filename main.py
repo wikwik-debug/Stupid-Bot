@@ -1,4 +1,5 @@
 from pydoc import describe
+from threading import _profile_hook
 import discord
 from discord import Embed, AuditLogAction, Guild
 from discord.ext import commands
@@ -13,6 +14,7 @@ import requests
 import random
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 def get_prefix(bot, message):
     with open("prefixes.json", "r") as f:
@@ -162,31 +164,35 @@ async def nsfw(ctx, type = None):
       responseEmbed = Embed(
         url = data["message"],
         title=f"<:NSFW:962289749954027571> {type.capitalize()}",
-        color = 0xffffff
+        color = 0xffffff,
+        timestamp = datetime.now()
       )
-      if data["message"].endswith(".gif"):
-        await ctx.send("https://tenor.com/view/mods-he-posted-nsfw-gif-23166437")
-      else:
-        url = data["message"]
-        
-        responseEmbed.set_image(url=url)
-        
-        responseEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
-        
-        await ctx.send(embed = responseEmbed)
 
-async def save_audit_logs(guild):
-  with open(f'audit_logs_{guild.name}.txt', 'w+') as f:
-    async for entry in guild.audit_logs(limit=100):
-      f.writelines(f'- {entry.user} did {entry.action} to {entry.target}\n')
+      url = data["message"]
+        
+      responseEmbed.set_image(url=url)
+        
+      responseEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+        
+      await ctx.send(embed = responseEmbed)
+
+
 
 @bot.command()
 async def test(ctx):
-  url = "http://api.oboobs.ru/boobs/1/20000"
-  response = requests.get(url)
+  url = "https://api.dagpi.xyz/data/joke"
+  headers = {
+    "Authorization": "token"
+  }
+  response = requests.get(url, headers=headers)
   data = json.loads(response.text)
-  print(data["preview"])
-  
+
+  print(data)
+
+@bot.command()
+async def guild(ctx):
+  for i in bot.guilds:
+    await ctx.send(f"Server ID: {i.id}\nServer Name: {i.name}\nMember Count: {i.member_count}\n\n")
 
 
 
@@ -235,7 +241,7 @@ async def ch_pr():
       botStatus = random.choice(botStatuses)
       botStatusType = random.choice(activityType)
 
-      await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type = botStatusType, name = botStatus))
+      await bot.change_presence(activity=discord.Activity(type = botStatusType, name = botStatus))
 
       await asyncio.sleep(25)
 

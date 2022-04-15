@@ -43,13 +43,13 @@ class Events(Cog):
 
         with open("prefixes.json", "w") as f:
             json.dump(prefixes, f, indent = 4)
-  
-    @Cog.listener()
-    async def on_member_join(self, member):
-        guild = self.bot.get_guild(900562030723993631)
-        channel = self.bot.get_channel(900562030723993634)
-        await channel.send(f"Welcome to the server {member.mention} ! :partying_face:")
-        await member.send(f"Welcome to the **{guild.name}** server, {member.mention}! :partying_face:")
+
+    # @Cog.listener()
+    # async def on_member_join(self, member):
+    #     guild = self.bot.get_guild(900562030723993631)
+    #     channel = self.bot.get_channel(900562030723993634)
+    #     await channel.send(f"Welcome to the server {member.mention} ! :partying_face:")
+    #     await member.send(f"Welcome to the **{guild.name}** server, {member.mention}! :partying_face:")
 
     @Cog.listener()
     async def on_message(self, message):

@@ -80,8 +80,8 @@ class Info(commands.Cog):
   @commands.command()
   async def serverinfo(self, ctx):
     embed = discord.Embed(
-      color= ctx.author.color,
       title = "Server information",
+      color = 0xffffff
     )
   
     embed.set_thumbnail(url=f'{ctx.guild.icon_url}')
@@ -91,11 +91,11 @@ class Info(commands.Cog):
     embed.add_field(name="Server Name", value=f'`{ctx.guild.name}`', inline=False)
     embed.add_field(name="Server ID", value=f'`{ctx.guild.id}`', inline=False)
     embed.add_field(name="Server Description", value=f'`{(ctx.guild.description)}`', inline=False)
-    embed.add_field(name="Server Owner", value=f'`{ctx.guild.owner}`', inline=False)
+    embed.add_field(name="Server Owner 👑", value=f'`{ctx.guild.owner}`', inline=False)
     embed.add_field(name="Verify Level", value=f'`{ctx.guild.verification_level}`', inline=False)
     embed.add_field(name="Server Boost Level", value=f'`{ctx.guild.premium_tier}`', inline=False)
-    embed.add_field(name="Server Boost Role", value=f'`{ctx.guild.premium_subscriber_role}`', inline=False)
-    embed.add_field(name="Highest Role", value=f'`{ctx.guild.roles[-1]}`', inline=False)
+    embed.add_field(name="Server Boost Role", value=f'{ctx.guild.premium_subscriber_role}', inline=False)
+    embed.add_field(name="Highest Role", value=f'{ctx.guild.roles[-1].mention}', inline=False)
     embed.add_field(name="Total Roles", value=f'`{len(ctx.guild.roles)}`', inline=False)
     embed.add_field(name="Total Members", value=f'`{ctx.guild.member_count}`', inline=False)
     embed.add_field(name="Total Channels", value=f'`{len(ctx.guild.channels)}`', inline=False)
@@ -104,7 +104,6 @@ class Info(commands.Cog):
 
 
     await ctx.send(embed=embed)
-    print(ctx.guild.filesize_limit)
   
   #The whois command
   @commands.command()

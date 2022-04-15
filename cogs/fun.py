@@ -13,7 +13,7 @@ class Fun(commands.Cog):
     self.bot = bot
 
   #The 8ball command
-  @commands.command(aliases = ["8ball"])
+  @commands.command(name="8ball")
   async def _8ball(self, ctx, *, question):
     responses = [ "As I see it, yes.",
                 "Oh hell yes.",

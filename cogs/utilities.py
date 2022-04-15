@@ -24,16 +24,18 @@ class Utilities(commands.Cog):
   #The add role command
   @commands.command(pass_context = True)
   @commands.has_permissions(manage_roles = True)
-  async def addrole(self, ctx, role:discord.Role = None, user:discord.Member = None):
+  async def addrole(self, ctx, role: discord.Role = None, user: discord.Member = None):
 
-    if role in user.roles:
-      await ctx.send(f'{user.metion} already has the role, {role.mention}')
+    if role is  None:
+      await ctx.reply(">addrole **<role>** <user>")
+      # "Please select or mention a role to assign"
     
-    elif role == None:
-      return await ctx.send(f"Please select a role to assign")
+    elif user is None:
+      await ctx.reply(">addrole <role> **<user>**")
+      # Please mention or provide an id of a member
     
-    elif user == None:
-      return await ctx.send("Please select a member")
+    elif role in user.roles:
+      await ctx.send(f"{user.mention} already has the role {role.mention}")
     
     else:
       await user.add_roles(role)
