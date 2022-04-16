@@ -1,5 +1,5 @@
 import discord
-from discord import TextChannel, User, Embed
+from discord import TextChannel, User, Embed, Guild
 from discord.ext import commands
 import asyncio
 
@@ -195,6 +195,20 @@ class Moderation(commands.Cog):
     )
     
     await ctx.send(embed = randomEmbed)
+  
+  #the globalkick command (for the owners only)
+  @commands.command()
+  async def globalkick(self, ctx, guild: Guild, user: User, *, reason = None):
+    fetchedGuild = await self.bot.fetch_guild(guild.id)
+    appinfo = await self.bot.application_info()
+    
+    if reason is None:
+      await ctx.reply("Please provide a reason to kick")
+    elif ctx.author != appinfo.owner:
+      await ctx.reply("You cant execute this command because your not the owner of the bot")
+    else:
+      await fetchedGuild.kick(user, reason=reason)
+      await ctx.send(f"Successfully kicked {user.mention} from `{guild.name}`")
 
 
 

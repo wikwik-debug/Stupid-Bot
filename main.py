@@ -1,5 +1,5 @@
 import discord
-from discord import Embed, AuditLogAction, Guild
+from discord import Embed, AuditLogAction, Guild, User, FFmpegOpusAudio
 from discord.ext import commands
 # from discord import app_commands
 from discord_slash import SlashCommand
@@ -208,7 +208,6 @@ async def dog(ctx):
   response = requests.get(url)
   data = json.loads(response.text)
   await ctx.send(data["message"])
-
 
 
 # @bot.command()
