@@ -11,24 +11,21 @@ class Moderation(commands.Cog):
   @commands.command(case_insective = True)
   @commands.has_permissions(kick_members = True)
   async def kick(self, ctx, member : discord.Member, *, reason=None):
-    try:
-      if reason is None:
-        await ctx.reply("Please provide a reason")
-      else:
-        kickEmbed = Embed(
-          description = f"You have been kicked from {ctx.guild.name}\nReason: {reason}",
-          color = 0xff0000
-        )
-
-        await member.send(embed = kickEmbed)
-
-        await member.kick(reason=reason)
-
-        await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
-    except Exception:
-      await ctx.send("cant DM the user")
-      print("cant DM the user")
+    
+    if reason is None:
+      await ctx.reply("Please provide a reason")
     else:
+      kickEmbed = Embed(
+        description = f"You have been kicked from {ctx.guild.name}\nReason: {reason}",
+        color = 0xff0000
+      )
+      
+      try:
+        await member.send(embed = kickEmbed)
+      except Exception:
+        await ctx.send("cant send a DM the user")
+        print("cant send a DM the user")
+      
       await member.kick(reason=reason)
       await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
 
