@@ -84,7 +84,7 @@ class Events(Cog):
             embed1 = discord.Embed(title = "My list of commands", colour = 0xffffff)
             embed1.add_field(name = "Moderation Commands", value = "``ban`` ``unban`` ``kick`` ``slowmode`` ``nickname`` ``mute`` ``unmute`` ``purge`` ``lock`` ``unlock`` ``channelban``", inline = False)
             embed1.add_field(name = "Info Commands", value = "``whois`` ``serverinfo`` ``botinfo`` ``covid`` ``emojiinfo`` ``numberinfo``", inline = False)
-            embed1.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say`` ``catgif``", inline = False)
+            embed1.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say`` ``catgif`` ``tweet``", inline = False)
             embed1.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle``", inline = False)
             embed1.add_field(name = "Miscellaneous Commands", value = "``run``", inline = False)
 
@@ -95,7 +95,7 @@ class Events(Cog):
             embed2 = discord.Embed(title = "My list of commands", colour = 0xffffff)
             embed2.add_field(name = "Moderation Commands", value = "``ban``\n ``unban``\n ``kick``\n ``slowmode``\n ``nickname``\n ``mute``\n ``unmute``\n ``purge``\n ``lock``\n ``unlock``\n ``channelban``", inline = True)
             embed2.add_field(name = "Info Commands", value = "``whois``\n ``serverinfo``\n ``botinfo``\n ``covid``\n ``emojiinfo``\n ``numberinfo``", inline = False)
-            embed2.add_field(name = "Fun Commands", value = "``8ball``\n ``avatar``\n ``Konnichiwa``\n ``meme``\n ``emojify``\n ``say``\n ``catgif``", inline = False)
+            embed2.add_field(name = "Fun Commands", value = "``8ball``\n ``avatar``\n ``Konnichiwa``\n ``meme``\n ``emojify``\n ``say``\n ``catgif``\n ``tweet``", inline = False)
             embed2.add_field(name = "Utilities Commands", value = "``changeprefix``\n ``addrole``\n ``removerole``\n ``toggle``", inline = False)
             embed2.add_field(name = "Miscellaneous Commands", value = "``run``", inline = False)
 

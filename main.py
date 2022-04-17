@@ -13,6 +13,7 @@ import random
 from dotenv import load_dotenv
 import os
 from datetime import datetime
+from randomSentences import getRandomSentences
 
 def get_prefix(bot, message):
     with open("prefixes.json", "r") as f:
@@ -174,19 +175,6 @@ async def nsfw(ctx, type = None):
         
       await ctx.send(embed = responseEmbed)
 
-
-
-@bot.command()
-async def test(ctx):
-  url = "https://api.dagpi.xyz/data/joke"
-  headers = {
-    "Authorization": "token"
-  }
-  response = requests.get(url, headers=headers)
-  data = json.loads(response.text)
-
-  print(data)
-
 @bot.command()
 async def guild(ctx):
   for i in bot.guilds:
@@ -208,6 +196,10 @@ async def dog(ctx):
   response = requests.get(url)
   data = json.loads(response.text)
   await ctx.send(data["message"])
+
+@bot.command()
+async def test(ctx):
+  await ctx.send(getRandomSentences())
 
 
 # @bot.command()
@@ -237,8 +229,10 @@ async def ch_pr():
   
   await bot.wait_until_ready()
 
+  appinfo = await bot.application_info()
+
   botStatuses = [
-    "bijaksana2000",
+    f"{appinfo.owner}",
     "discord.py",
     "You're mom",
     "Am pro",
@@ -246,7 +240,7 @@ async def ch_pr():
     "everything's go wrong",
     f"{len(bot.guilds)} server's | b!help",
     "Mr. Denjayu is a simp",
-    "Happy birthday Daniel"
+    "overspeculation"
   ]
 
   activityType = [discord.ActivityType.watching, discord.ActivityType.streaming, discord.ActivityType.playing, discord.ActivityType.listening, discord.ActivityType.competing]

@@ -88,7 +88,7 @@ class Fun(commands.Cog):
     avatarEmbed.set_image(url=user.avatar_url)
 
     await ctx.send(embed = avatarEmbed)
-  
+
   #The emojify command
   @commands.command()
   async def emojify(self, ctx, *, text):
@@ -119,7 +119,8 @@ class Fun(commands.Cog):
         emojis.append(beans)
     
     await ctx.send(''.join(emojis))
-  
+
+  #The tweet command
   @commands.command()
   async def tweet(self, ctx, *, message, member: discord.Member = None):
     member = ctx.author if not member else member

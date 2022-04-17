@@ -1,5 +1,5 @@
 import discord
-from discord import TextChannel, User, Embed, Guild
+from discord import TextChannel, User, Embed, Guild, PermissionOverwrite
 from discord.ext import commands
 import asyncio
 
@@ -16,14 +16,14 @@ class Moderation(commands.Cog):
     else:
       try:
         kickEmbed = Embed(
-          description = f"You have been kicked from {ctx.guild.name}\nReason: {reason}",
+          description = f"You have been kicked from ``{ctx.guild.name}``\nReason: {reason}",
           color = 0xff0000
         )
         
         await member.send(embed = kickEmbed)
       except:
-        await ctx.send("cant send a DM the user")
-        print("cant send a DM the user")
+        await ctx.send("cant send a DM to the user")
+        print("cant send a DM to the user")
 
       await member.kick(reason=reason)
       await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
@@ -140,34 +140,36 @@ class Moderation(commands.Cog):
   #The lock commmand
   @commands.command()
   @commands.has_permissions(manage_channels = True)
-  async def lock(self, ctx, channelName: TextChannel):
-    channel = await self.bot.fetch_channel(channelName.id)
+  async def lock(self, ctx, channelName: TextChannel = None):
+    channel = ctx.channel if channelName is None else await self.bot.fetch_channel(channelName.id)
 
     defaultRole = ctx.guild.default_role
     
-    overwrite = discord.PermissionOverwrite()
+    overwrite = PermissionOverwrite()
     
     overwrite.send_messages = False
     overwrite.use_slash_commands = False
-    
+
     await channel.set_permissions(defaultRole, overwrite=overwrite)
-    
+
     await ctx.send(f"{channel.mention} have been successfully locked")
+    
   
   #The unlock command
   @commands.command()
   @commands.has_permissions(manage_channels = True)
-  async def unlock(self, ctx, channelName: TextChannel):
+  async def unlock(self, ctx, channelName: TextChannel = None):
 
-    channel = await self.bot.fetch_channel(channelName.id)
+    channel = ctx.channel if channelName is None else await self.bot.fetch_channel(channelName.id)
     
     defaultRole = ctx.guild.default_role
 
-    overwrite = discord.PermissionOverwrite()
+    overwrite = PermissionOverwrite()
     
     overwrite.send_messages = True
     
     await channel.set_permissions(defaultRole, overwrite=overwrite)
+    
     
     await ctx.send(f"{channel.mention} have been successfully unlocked")
   
@@ -176,7 +178,7 @@ class Moderation(commands.Cog):
   @commands.has_permissions(ban_members = True)
   async def channelban(self, ctx, member: discord.Member, reason = None):
     
-    overwrite = discord.PermissionOverwrite()
+    overwrite = PermissionOverwrite()
     
     overwrite.view_channel = False
     
