@@ -6,6 +6,7 @@ from discord.ext import commands
 import random
 import aiohttp
 import requests
+import os
 
 class Fun(commands.Cog):
 
@@ -137,6 +138,22 @@ class Fun(commands.Cog):
   async def say(self, ctx, *, message):
     await ctx.send(message)
   
+  @commands.command()
+  async def dog(self, ctx):
+    url = "https://dog.ceo/api/breeds/image/random"
+    response = requests.get(url)
+    data = json.loads(response.text)
+    await ctx.send(data["message"])
+  
+  @commands.command()
+  async def catgif(self, ctx):
+    url = "https://api.thecatapi.com/v1/images/search?mime_types=gif"
+    header = {
+      "x-api-key": os.getenv("CAT_KEY")
+    }
+    response = requests.get(url, headers=header)
+    data = json.loads(response.text)
+    await ctx.send(data[0]["url"])
 
 def setup(bot):
   bot.add_cog(Fun(bot))

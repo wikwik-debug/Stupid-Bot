@@ -186,23 +186,6 @@ async def guilds(ctx):
     await ctx.send(embed=botGuildEmbed)
 
 @bot.command()
-async def catgif(ctx):
-  url = "https://api.thecatapi.com/v1/images/search?mime_types=gif"
-  header = {
-    "x-api-key": os.getenv("CAT_KEY")
-  }
-  response = requests.get(url, headers=header)
-  data = json.loads(response.text)
-  await ctx.send(data[0]["url"])
-
-@bot.command()
-async def dog(ctx):
-  url = "https://dog.ceo/api/breeds/image/random"
-  response = requests.get(url)
-  data = json.loads(response.text)
-  await ctx.send(data["message"])
-
-@bot.command()
 async def test(ctx):
   await ctx.send(getRandomSentences())
 
@@ -211,13 +194,6 @@ async def snow(ctx, id):
   parsedResult = int(id)
   timeFormatted = snowflake_time(parsedResult).strftime("Date: %A, %d %B %Y\nTime: %H:%M %p %Z")
   await ctx.send(timeFormatted)
-  print(timeFormatted)
-
-@bot.command()
-async def leave(ctx):
-  guild = ctx.guild
-  await guild.leave(bot.user)
-
 
 # @bot.command()
 # async def load(ctx, extension):
