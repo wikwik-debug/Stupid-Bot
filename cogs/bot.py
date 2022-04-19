@@ -35,7 +35,7 @@ class Bot(commands.Cog):
     botInfoEmbed.add_field(name = "Servers <:Servers:903501984273932298>", value= len(self.bot.guilds))
     botInfoEmbed.add_field(name = "Users <:Person:903497301828444181>", value = len(self.bot.users))
     botInfoEmbed.add_field(name = "Invite link ✉", value="https://dsc.gg/stupid-bot")
-    botInfoEmbed.add_field(name = "This bot was created at:", value = f'{self.bot.user.created_at.strftime("%m/%d/%Y, %H:%M:%S UTC")} (<t:1630335607:R>)', inline=False)
+    botInfoEmbed.add_field(name = "This bot was created at:", value = f'{self.bot.user.created_at.strftime("%A, %d %B %Y  %H:%M %p %Z")} (<t:1630335607:R>)', inline=False)
 
     await ctx.send(embed = botInfoEmbed)
 

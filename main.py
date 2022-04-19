@@ -1,6 +1,7 @@
 import discord
-from discord import Embed, Status
+from discord import Embed, Status, Guild, Colour
 from discord.ext import commands
+from discord.utils import snowflake_time, get
 # from discord import app_commands
 from discord_slash import SlashCommand
 
@@ -176,9 +177,13 @@ async def nsfw(ctx, type = None):
       await ctx.send(embed = responseEmbed)
 
 @bot.command()
-async def guild(ctx):
+async def guilds(ctx):
   for i in bot.guilds:
-    await ctx.send(f"Server ID: {i.id}\nServer Name: {i.name}\nMember Count: {i.member_count}\n\n")
+    botGuildEmbed = Embed(
+      description=f"Server ID: {i.id}\nServer Name: {i.name}\nServer Owner: {i.owner} ({i.owner_id})\nMember Count: {i.member_count}\n\n",
+      color = Colour.random()
+    ) 
+    await ctx.send(embed=botGuildEmbed)
 
 @bot.command()
 async def catgif(ctx):
@@ -201,7 +206,17 @@ async def dog(ctx):
 async def test(ctx):
   await ctx.send(getRandomSentences())
 
-print(bot.cached_messages)
+@bot.command()
+async def snow(ctx, id):
+  parsedResult = int(id)
+  timeFormatted = snowflake_time(parsedResult).strftime("Date: %A, %d %B %Y\nTime: %H:%M %p %Z")
+  await ctx.send(timeFormatted)
+  print(timeFormatted)
+
+@bot.command()
+async def leave(ctx):
+  guild = ctx.guild
+  await guild.leave(bot.user)
 
 
 # @bot.command()

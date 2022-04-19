@@ -78,29 +78,32 @@ class Info(commands.Cog):
   
   #The serverinfo command
   @commands.command()
-  async def serverinfo(self, ctx):
+  async def serverinfo(self, ctx, guildID = None):
+    guild = ctx.guild if guildID is None else await self.bot.fetch_guild(guildID)
+    serverBosterRole = "``None``" if guild.premium_subscriber_role is None else guild.premium_subscriber_role
+    
     embed = discord.Embed(
       title = "Server information",
       color = 0xffffff
     )
   
-    embed.set_thumbnail(url=f'{ctx.guild.icon_url}')
+    embed.set_thumbnail(url=f'{guild.icon_url}')
     embed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
 
 
-    embed.add_field(name="Server Name", value=f'`{ctx.guild.name}`', inline=False)
-    embed.add_field(name="Server ID", value=f'`{ctx.guild.id}`', inline=False)
-    embed.add_field(name="Server Description", value=f'`{(ctx.guild.description)}`', inline=False)
-    embed.add_field(name="Server Owner 👑", value=f'`{ctx.guild.owner}`', inline=False)
-    embed.add_field(name="Verify Level", value=f'`{ctx.guild.verification_level}`', inline=False)
-    embed.add_field(name="Server Boost Level", value=f'`{ctx.guild.premium_tier}`', inline=False)
-    embed.add_field(name="Server Boost Role", value=f'{ctx.guild.premium_subscriber_role}', inline=False)
-    embed.add_field(name="Highest Role", value=f'{ctx.guild.roles[-1].mention}', inline=False)
-    embed.add_field(name="Total Roles", value=f'`{len(ctx.guild.roles)}`', inline=False)
-    embed.add_field(name="Total Members", value=f'`{ctx.guild.member_count}`', inline=False)
-    embed.add_field(name="Total Channels", value=f'`{len(ctx.guild.channels)}`', inline=False)
-    embed.add_field(name="Total Categories", value=f'`{len(ctx.guild.categories)}`', inline=False)
-    embed.add_field(name="The server was created at", value=f'`{ctx.guild.created_at.strftime("%m/%d/%Y, %H:%M:%S")}`', inline=False)
+    embed.add_field(name="Server Name", value=f'`{guild.name}`', inline=False)
+    embed.add_field(name="Server ID", value=f'`{guild.id}`', inline=False)
+    embed.add_field(name="Server Description", value=f'`{(guild.description)}`', inline=False)
+    embed.add_field(name="Server Owner 👑", value=f'`{guild.owner}`', inline=False)
+    embed.add_field(name="Verify Level", value=f'`{guild.verification_level}`', inline=False)
+    embed.add_field(name="Server Boost Level", value=f'`{guild.premium_tier}`', inline=False)
+    embed.add_field(name="Server Boost Role", value=f'{serverBosterRole}', inline=False)
+    embed.add_field(name="Highest Role", value=f'{guild.roles[-1].mention}', inline=False)
+    embed.add_field(name="Total Roles", value=f'`{len(guild.roles)}`', inline=False)
+    # embed.add_field(name="Total Members", value=f'`{guild.member_count}`', inline=False)
+    embed.add_field(name="Total Channels", value=f'`{len(guild.channels)}`', inline=False)
+    embed.add_field(name="Total Categories", value=f'`{len(guild.categories)}`', inline=False)
+    embed.add_field(name="The server was created at:", value=guild.created_at.strftime("``Date: %A, %d %B %Y``\n``Time: %H:%M %p %Z``"), inline=False)
 
 
     await ctx.send(embed=embed)
