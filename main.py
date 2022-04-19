@@ -1,5 +1,5 @@
 import discord
-from discord import Embed, AuditLogAction, Guild, User, FFmpegOpusAudio
+from discord import Embed, Status
 from discord.ext import commands
 # from discord import app_commands
 from discord_slash import SlashCommand
@@ -200,6 +200,8 @@ async def dog(ctx):
 @bot.command()
 async def test(ctx):
   await ctx.send(getRandomSentences())
+
+print(bot.cached_messages)
 
 
 # @bot.command()
