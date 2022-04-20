@@ -1,10 +1,8 @@
 import discord
-from discord import Embed, Status, Guild, Colour
-from discord.ext import commands
-from discord.utils import snowflake_time, get
+from discord import Embed, Status, Guild, Colour, AuditLogAction, User
+from discord.ext.commands import Bot
+from discord.utils import snowflake_time
 # from discord import app_commands
-from discord_slash import SlashCommand
-
 
 import json
 from time import time
@@ -26,28 +24,8 @@ def configure():
 
 intents = discord.Intents.all()
 
-bot = commands.Bot(command_prefix=get_prefix, intents=intents)
+bot = Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
 bot.remove_command("help")
-slash = SlashCommand(bot, sync_commands=True)
-
-guild_id = [900562030723993631, 896429122358739034, 929595596413747261]
-
-@slash.slash(name = "Ping", description = "Get the latency of the bot" , guild_ids = guild_id)
-async def ping(ctx):
-  start = time()
-  message = await ctx.send(f"API latency: ``{bot.latency * 1000:,.0f}ms``")
-  end = time()
-
-  await message.edit(content = f"API latency: ``{bot.latency * 1000:,.0f}ms``\nResponse time: ``{(end-start)*1000:,.0f}ms``")
-
-@slash.slash(name = "Clear", description = "To delete an amount of messages", guild_ids = guild_id)
-async def clear(ctx, amount: int):
-
-  await ctx.channel.purge(limit = amount)
-
-  message = await ctx.send("Done!")
-
-  await message.delete()
 
 
 @bot.command()
@@ -180,7 +158,7 @@ async def nsfw(ctx, type = None):
 async def guilds(ctx):
   for i in bot.guilds:
     botGuildEmbed = Embed(
-      description=f"Server ID: {i.id}\nServer Name: {i.name}\nServer Owner: {i.owner} ({i.owner_id})\nMember Count: {i.member_count}\n\n",
+      description=f"Server ID: {i.id}\nServer Name: {i.name}\nServer Owner: {i.owner.mention} ({i.owner_id})\nMember Count: {i.member_count}\n\n",
       color = Colour.random()
     ) 
     await ctx.send(embed=botGuildEmbed)
@@ -194,6 +172,34 @@ async def snow(ctx, id):
   parsedResult = int(id)
   timeFormatted = snowflake_time(parsedResult).strftime("Date: %A, %d %B %Y\nTime: %H:%M %p %Z")
   await ctx.send(timeFormatted)
+
+@bot.command()
+async def whoadd(ctx, *, user: User):
+  guild = ctx.guild
+
+  async for entries in guild.audit_logs(action=AuditLogAction.bot_add):
+    if entries.target.id == user.id:
+      entrisEmbed = Embed(
+        title=f"{entries.target}",
+        color=entries.target.color,
+        timestamp=datetime.utcnow()
+      )
+      entrisEmbed.set_thumbnail(url=entries.target.avatar_url)
+      entrisEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+      
+      entrisEmbed.add_field(name="Added by:", value=f"{entries.user.mention} (``{entries.user.id}``)", inline=False)
+      entrisEmbed.add_field(name="Joined:", value=f"{entries.created_at.strftime('%A, %d %B %Y | %H:%M %p %Z')}", inline=True)
+      
+      await ctx.send(embed=entrisEmbed)
+    elif entries is None:
+      await ctx.reply("Cant find the specified bot")
+
+@bot.command()
+async def inter(ctx):
+  guild = ctx.guild
+
+  async for entries in guild.audit_logs(action=AuditLogAction.integration_create):
+    await ctx.send(entries.target)
 
 # @bot.command()
 # async def load(ctx, extension):
@@ -245,6 +251,7 @@ async def ch_pr():
       await bot.change_presence(activity=discord.Activity(type = botStatusType, name = botStatus))
 
       await asyncio.sleep(25)
+
 
 for filename in os.listdir("./cogs"):
   if filename.endswith(".py"):
