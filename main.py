@@ -35,132 +35,19 @@ async def salatiga(ctx):
   await message.edit(content="Tapi boong 😂 😂")
 
 @bot.command()
-async def nsfw(ctx, type = None):
-
-  if type == "food":
-    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
-  elif type == "coffee":
-    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
-  elif type == "kanna":
-    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
-  elif type == "neko":
-    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
-  elif type == "holo":
-    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
-  elif type == "kemonomimi":
-    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
-  elif type == "gah":
-    await ctx.send("This type is blacklisted from the command\nReason: Not NSFW related")
-  elif type == "tentacle":
-    await ctx.send("This type is blacklisted from the command")
-  elif type == "yaoi":
-    await ctx.send("This type is blacklisted from the command\nReason: Homosexual")
-  elif type == "porngif":
-    urlType = f"https://nekobot.xyz/api/image?type=pgif"
-    
-    responseType = requests.get(urlType)
-    
-    dataType = json.loads(responseType.text)
-    
-    responseEmbedType = Embed(
-      url = dataType["message"],
-      title = "<:NSFW:962289749954027571> Pgif",
-      color = 0xffffff
-    )
-    
-    urlTypeEmbed = dataType["message"]
-    
-    responseEmbedType.set_image(url=urlTypeEmbed)
-    
-    responseEmbedType.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
-    
-    await ctx.send(embed = responseEmbedType)
-  elif type == None:
-      typeEmbed = Embed(
-        title="List of available types:",
-        description = """
-        - hass
-        - hmidriff
-        - pgif
-        - 4k
-        - hentai
-        - hneko
-        - hkitsune
-        - anal
-        - hanal
-        - gonewild
-        - ass
-        - pussy
-        - thigh
-        - hthigh
-        - paizuri
-        - boobs
-        - hboobs
-        """
-      )
-
-      await ctx.send(embed = typeEmbed)
-  else:
-    url = f"https://nekobot.xyz/api/image?type={type}"
-    
-    response = requests.get(url)
-    
-    data = json.loads(response.text)
-    
-    if data["message"] == "Unknown Image Type":
-      message = await ctx.reply("Invalid type!")
-      
-      await asyncio.sleep(5)
-      
-      await message.delete()
-      
-      validEmbed = Embed(
-        title="Current Valid types:",
-        description = """
-        - hass
-        - hmidriff
-        - pgif
-        - 4k
-        - hentai
-        - hneko
-        - hkitsune
-        - anal
-        - hanal
-        - gonewild
-        - ass
-        - pussy
-        - thigh
-        - hthigh
-        - paizuri
-        - boobs
-        - hboobs
-        """
-      )
-      
-      await ctx.reply(embed=validEmbed)
-    else:
-      responseEmbed = Embed(
-        url = data["message"],
-        title=f"<:NSFW:962289749954027571> {type.capitalize()}",
-        color = 0xffffff,
-        timestamp = datetime.now()
-      )
-
-      url = data["message"]
-        
-      responseEmbed.set_image(url=url)
-        
-      responseEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
-        
-      await ctx.send(embed = responseEmbed)
-
-@bot.command()
 async def guilds(ctx):
   for i in bot.guilds:
     botGuildEmbed = Embed(
-      description=f"Server ID: {i.id}\nServer Name: {i.name}\nServer Owner: {i.owner.mention} ({i.owner_id})\nMember Count: {i.member_count}\n\n",
+      title=i.name,
       color = Colour.random()
     ) 
+    botGuildEmbed.set_thumbnail(url=i.owner.avatar_url)
+    botGuildEmbed.set_image(url=i.icon_url)
+    
+    botGuildEmbed.add_field(name="Server ID:", value=i.id, inline=False)
+    botGuildEmbed.add_field(name="Server Owner:", value=f"{i.owner} ({i.owner_id})", inline=True)
+    botGuildEmbed.add_field(name="Member Count:", value=i.member_count, inline=False)
+
     await ctx.send(embed=botGuildEmbed)
 
 @bot.command()
@@ -174,32 +61,17 @@ async def snow(ctx, id):
   await ctx.send(timeFormatted)
 
 @bot.command()
-async def whoadd(ctx, *, user: User):
-  guild = ctx.guild
-
-  async for entries in guild.audit_logs(action=AuditLogAction.bot_add):
-    if entries.target.id == user.id:
-      entrisEmbed = Embed(
-        title=f"{entries.target}",
-        color=entries.target.color,
-        timestamp=datetime.utcnow()
-      )
-      entrisEmbed.set_thumbnail(url=entries.target.avatar_url)
-      entrisEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
-      
-      entrisEmbed.add_field(name="Added by:", value=f"{entries.user.mention} (``{entries.user.id}``)", inline=False)
-      entrisEmbed.add_field(name="Joined:", value=f"{entries.created_at.strftime('%A, %d %B %Y | %H:%M %p %Z')}", inline=True)
-      
-      await ctx.send(embed=entrisEmbed)
-    elif entries is None:
-      await ctx.reply("Cant find the specified bot")
-
-@bot.command()
-async def inter(ctx):
-  guild = ctx.guild
-
-  async for entries in guild.audit_logs(action=AuditLogAction.integration_create):
-    await ctx.send(entries.target)
+async def leave(ctx, guild: Guild = None):
+  fetchedGuild = await bot.fetch_guild(guild.id)
+  appinfo = await bot.application_info()
+  
+  if guild is None:
+    await ctx.reply("Pleave provide a guild/server to leave")
+  elif ctx.author != appinfo.owner:
+    await ctx.reply("You cant execute this command because your not the owner of the bot")
+  else:
+    await fetchedGuild.leave()
+    await ctx.send(f"I have left the guild called: {fetchedGuild.name} (`{fetchedGuild.id}`)")
 
 # @bot.command()
 # async def load(ctx, extension):

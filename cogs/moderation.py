@@ -203,6 +203,7 @@ class Moderation(commands.Cog):
   
   #the globalkick command (for the owners only)
   @commands.command()
+  @commands.is_owner()
   async def globalkick(self, ctx, guild: Guild, user: User, *, reason = None):
     fetchedGuild = await self.bot.fetch_guild(guild.id)
     appinfo = await self.bot.application_info()

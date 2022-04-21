@@ -25,7 +25,7 @@ class Info(commands.Cog):
     embed.add_field(name = "Moderation Commands", value = "``ban`` ``unban`` ``kick`` ``slowmode`` ``nickname`` ``mute`` ``unmute`` ``purge`` ``lock`` ``unlock`` ``channelban``", inline = False)
     embed.add_field(name = "Info Commands", value = "``whois`` ``serverinfo`` ``botinfo`` ``covid`` ``emojiinfo`` ``numberinfo``", inline = False)
     embed.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say`` ``catgif`` ``tweet``", inline = False)
-    embed.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle``", inline = False)
+    embed.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle`` ``whoadd``", inline = False)
     embed.add_field(name = "Miscellaneous Commands", value = "``run``", inline = False)
 
     await ctx.send(embed = embed)

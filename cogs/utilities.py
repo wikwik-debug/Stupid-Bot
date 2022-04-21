@@ -1,7 +1,8 @@
-import discord
+from  discord import User, Role, Member, AuditLogAction, Embed
 from discord.ext import commands
 
 import json
+from datetime import datetime
 
 class Utilities(commands.Cog):
   def __init__(self, bot):
@@ -23,8 +24,8 @@ class Utilities(commands.Cog):
   
   #The add role command
   @commands.command(pass_context = True)
-  @commands.has_permissions(manage_roles = True)
-  async def addrole(self, ctx, role: discord.Role = None, user: discord.Member = None):
+  @commands.has_permissions(administrator = True)
+  async def addrole(self, ctx, role: Role = None, user: Member = None):
 
     if role is  None:
       await ctx.reply(">addrole **<role>** <user>")
@@ -43,8 +44,8 @@ class Utilities(commands.Cog):
   
   #The remove role command
   @commands.command(pass_context = True)
-  @commands.has_permissions(manage_roles = True)
-  async def removerole(self, ctx, role: discord.Role, user: discord.Member):
+  @commands.has_permissions(administrator = True)
+  async def removerole(self, ctx, role: Role, user: Member):
 
     if role in user.roles:
       await user.remove_roles(role)
@@ -77,11 +78,26 @@ class Utilities(commands.Cog):
     await ctx.guild.edit(name=name)
     await ctx.send(f"I have changed the server's name to `{ctx.guild.name}`")
   
-  @commands.command(name = "createserver")
-  async def create_guild(self, ctx, name, region):
-    await self.bot.create_guild(name=name, region=region)
-    await ctx.send(f"I have created a server called {name}")
-
+  #The whoadd command
+  @commands.command()
+  @commands.has_permissions(administrator = True)
+  async def whoadd(self, ctx, *, user: User):
+    guild = ctx.guild
+    
+    async for entries in guild.audit_logs(action=AuditLogAction.bot_add):
+      if entries.target.id == user.id:
+        entrisEmbed = Embed(
+          title=f"{entries.target}",
+          color=entries.target.color,
+          timestamp=datetime.utcnow()
+        )
+        entrisEmbed.set_thumbnail(url=entries.target.avatar_url)
+        entrisEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+        
+        entrisEmbed.add_field(name="Added by:", value=f"{entries.user.mention} (``{entries.user.id}``)", inline=False)
+        entrisEmbed.add_field(name="Joined:", value=f"{entries.created_at.strftime('%A, %d %B %Y | %H:%M %p %Z')}", inline=True)
+        
+        await ctx.send(embed=entrisEmbed)
 
 def setup(bot):
   bot.add_cog(Utilities(bot))

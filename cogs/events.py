@@ -1,4 +1,4 @@
-import discord
+from discord import AuditLogAction, Embed
 from discord.ext.commands import Cog
 from discord.ext import commands
 import json
@@ -24,16 +24,20 @@ class Events(Cog):
 
         with open("prefixes.json", "w") as f:
             json.dump(prefixes, f, indent = 4)
+        
+        async for entries in guild.audit_logs(limit=1, action=AuditLogAction.bot_add):
+            general = find(lambda x : x.name == 'general',  guild.text_channels)
+            chat = find(lambda x : x.name == "chat", guild.text_channels)
+            
+            if entries.target.id == 881735007893336084:
+                if general and general.permissions_for(guild.me).send_messages:
+                    await general.send(f"Thank you for inviting me! {entries.user.mention}")
+                    # return
 
-        general = find(lambda x : x.name == 'general',  guild.text_channels)
-        chat = find(lambda x : x.name == "chat", guild.text_channels)
+                elif chat and chat.permissions_for(guild.me).send_messages:
+                    await chat.send(f"Thank you for inviting me! {entries.user.mention}")
+                    # return
 
-        if general and general.permissions_for(guild.me).send_messages:
-            await general.send("Thank you for inviting me!")
-
-        elif chat and chat.permissions_for(guild.me).send_messages:
-            await chat.send("Thank you for inviting me!")
-  
     @Cog.listener() 
     async def on_guild_remove(self, guild):
         with open("prefixes.json", "r") as f:
@@ -81,22 +85,22 @@ class Events(Cog):
         mentionHelpForMobile = f'<@!881735007893336084> help'
 
         if message.content == mentionHelpForPC:
-            embed1 = discord.Embed(title = "My list of commands", colour = 0xffffff)
+            embed1 = Embed(title = "My list of commands", colour = 0xffffff)
             embed1.add_field(name = "Moderation Commands", value = "``ban`` ``unban`` ``kick`` ``slowmode`` ``nickname`` ``mute`` ``unmute`` ``purge`` ``lock`` ``unlock`` ``channelban``", inline = False)
             embed1.add_field(name = "Info Commands", value = "``whois`` ``serverinfo`` ``botinfo`` ``covid`` ``emojiinfo`` ``numberinfo``", inline = False)
             embed1.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say`` ``catgif`` ``tweet``", inline = False)
-            embed1.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle``", inline = False)
+            embed1.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle`` ``whoadd``", inline = False)
             embed1.add_field(name = "Miscellaneous Commands", value = "``run``", inline = False)
 
             await message.channel.send(embed = embed1)
         
         # For mobile compatibility
         elif message.content == mentionHelpForMobile:
-            embed2 = discord.Embed(title = "My list of commands", colour = 0xffffff)
+            embed2 = Embed(title = "My list of commands", colour = 0xffffff)
             embed2.add_field(name = "Moderation Commands", value = "``ban``\n ``unban``\n ``kick``\n ``slowmode``\n ``nickname``\n ``mute``\n ``unmute``\n ``purge``\n ``lock``\n ``unlock``\n ``channelban``", inline = True)
             embed2.add_field(name = "Info Commands", value = "``whois``\n ``serverinfo``\n ``botinfo``\n ``covid``\n ``emojiinfo``\n ``numberinfo``", inline = False)
             embed2.add_field(name = "Fun Commands", value = "``8ball``\n ``avatar``\n ``Konnichiwa``\n ``meme``\n ``emojify``\n ``say``\n ``catgif``\n ``tweet``", inline = False)
-            embed2.add_field(name = "Utilities Commands", value = "``changeprefix``\n ``addrole``\n ``removerole``\n ``toggle``", inline = False)
+            embed2.add_field(name = "Utilities Commands", value = "``changeprefix``\n ``addrole``\n ``removerole``\n ``toggle``\n ``whoadd``", inline = False)
             embed2.add_field(name = "Miscellaneous Commands", value = "``run``", inline = False)
 
             await message.channel.send(embed = embed2)
