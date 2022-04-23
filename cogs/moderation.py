@@ -142,7 +142,7 @@ class Moderation(commands.Cog):
     else:
       if isinstance(seconds, str):
         seconds = int(seconds)
-        
+
       await ctx.channel.edit(slowmode_delay=seconds)
       await ctx.send(f'The slowmode have been set to ``{seconds}`` seconds')
 
