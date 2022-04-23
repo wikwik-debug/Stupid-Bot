@@ -1,5 +1,5 @@
 import discord
-from discord import TextChannel, User, Embed, Guild, PermissionOverwrite, Member
+from discord import TextChannel, User, Embed, Guild, PermissionOverwrite, Member, AuditLogAction
 from discord.ext import commands
 from discord.ext.commands import MemberConverter
 
@@ -49,16 +49,33 @@ class Moderation(commands.Cog):
   @commands.command()
   @commands.has_permissions(manage_messages = True)
   async def clear(self, ctx, amount: int):
-    
     await ctx.channel.purge(limit = amount)
   
   #The nickname command
-  @commands.command(pass_content=False, aliases = ["changeNick"])
+  @commands.command(aliases = ["changeNick"])
   @commands.has_permissions(manage_nicknames = True)
-  async def nickname(self, ctx, member: Member, *, nick):
+  async def nickname(self, ctx, member:MemberConverter, *, nick = None):
+    # await member.edit(nick=nick)
+    # guild = ctx.guild
+    
+    # async for entries in guild.audit_logs(action=AuditLogAction.member_update):
+    #   if nick is None:
+    #     await member.edit(nick=None)
+    #     await ctx.send(f"Nickname changed back to ``{entries.target.name}``")
+    #     return
+    #   else:
+    #       if entries.target.id == member.id:
+    #         if entries.changes.before.nick is None:
+    #           await ctx.send(f'Nickname changed from ``{entries.target.name}`` to ``{entries.changes.after.nick}`` ')
+    #         else:
+    #           await ctx.send(f'Nickname changed from ``{entries.changes.before.nick}`` to ``{entries.changes.after.nick}`` ')
+    #         return
+    
+    oldNickname = member.display_name
     await member.edit(nick=nick)
-    await ctx.send(f'Nickname was changed for {member.mention} ')
-  
+    newNickname = member.display_name
+    await ctx.send(f"Nickname changed from ``{oldNickname}`` to ``{newNickname}``")
+
   class DurationConverter(commands.Converter):
     async def convert(self, ctx, argument):
       amount = argument[:-1]
@@ -139,6 +156,8 @@ class Moderation(commands.Cog):
     if seconds == "reset":
       await ctx.channel.edit(slowmode_delay=0)
       await ctx.send("The slomode have been turned off")
+    elif seconds is None:
+      await ctx.reply("Please specify a value to slowmode")
     else:
       if isinstance(seconds, str):
         seconds = int(seconds)
