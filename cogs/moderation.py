@@ -1,6 +1,8 @@
 import discord
-from discord import TextChannel, User, Embed, Guild, PermissionOverwrite
+from discord import TextChannel, User, Embed, Guild, PermissionOverwrite, Member
 from discord.ext import commands
+from discord.ext.commands import MemberConverter
+
 import asyncio
 
 class Moderation(commands.Cog):
@@ -10,7 +12,7 @@ class Moderation(commands.Cog):
   #The kick command
   @commands.command(case_insensitive = True)
   @commands.has_permissions(kick_members = True)
-  async def kick(self, ctx, member : discord.Member, *, reason=None):
+  async def kick(self, ctx, member : Member, *, reason=None):
     if reason is None:
       await ctx.reply("Please provide a reason")
     else:
@@ -23,15 +25,15 @@ class Moderation(commands.Cog):
         await member.send(embed = kickEmbed)
       except:
         await ctx.send("cant send a DM to the user")
-        print("cant send a DM to the user")
-
-      await member.kick(reason=reason)
-      await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
+        # print("cant send a DM to the user")
+      else:
+        await member.kick(reason=reason)
+        await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
 
   #The ban command
   @commands.command()
   @commands.has_permissions(ban_members = True)
-  async def ban(self, ctx, member : commands.MemberConverter, *, reason=None):
+  async def ban(self, ctx, member : MemberConverter, *, reason=None):
     await member.ban(reason=reason)
     await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
 
@@ -53,7 +55,7 @@ class Moderation(commands.Cog):
   #The nickname command
   @commands.command(pass_content=False, aliases = ["changeNick"])
   @commands.has_permissions(manage_nicknames = True)
-  async def nickname(self, ctx, member: discord.Member, *, nick):
+  async def nickname(self, ctx, member: Member, *, nick):
     await member.edit(nick=nick)
     await ctx.send(f'Nickname was changed for {member.mention} ')
   
@@ -68,7 +70,7 @@ class Moderation(commands.Cog):
   #The mute command
   @commands.command()
   @commands.has_permissions(manage_messages = True)
-  async def mute(self, ctx, member:discord.Member, duration: DurationConverter, reason = None):
+  async def mute(self, ctx, member:Member, duration: DurationConverter, reason = None):
     role = discord.utils.get(ctx.guild.roles, name="Muted")
     guild = ctx.guild
 
@@ -118,9 +120,9 @@ class Moderation(commands.Cog):
   #The unmute command
   @commands.command()
   @commands.has_permissions(manage_messages = True)
-  async def unmute(self, ctx, member : discord.Member):
+  async def unmute(self, ctx, member:Member):
     role = discord.utils.get(ctx.guild.roles, name="Muted")
-    
+
     await member.remove_roles(role)
 
     embed3 = Embed(
@@ -129,14 +131,21 @@ class Moderation(commands.Cog):
         )
 
     await ctx.send(embed = embed3)
-  
+
   #The slowmode command
   @commands.command()
   @commands.has_permissions(manage_channels = True)
-  async def slowmode(ctx, seconds: int):
-    await ctx.channel.edit(slowmode_delay=seconds)
-    await ctx.send(f'The slowmode have been set to ``{seconds}`` seconds')
-  
+  async def slowmode(self, ctx, seconds:str = None):
+    if seconds == "reset":
+      await ctx.channel.edit(slowmode_delay=0)
+      await ctx.send("The slomode have been turned off")
+    else:
+      if isinstance(seconds, str):
+        seconds = int(seconds)
+
+      await ctx.channel.edit(slowmode_delay=seconds)
+      await ctx.send(f'The slowmode have been set to ``{seconds}`` seconds')
+
   #The lock commmand
   @commands.command()
   @commands.has_permissions(manage_channels = True)
@@ -149,6 +158,7 @@ class Moderation(commands.Cog):
     
     overwrite.send_messages = False
     overwrite.use_slash_commands = False
+    overwrite.view_channel = False
 
     await channel.set_permissions(defaultRole, overwrite=overwrite)
 
@@ -167,6 +177,7 @@ class Moderation(commands.Cog):
     overwrite = PermissionOverwrite()
     
     overwrite.send_messages = True
+    overwrite.view_channel = False
     
     await channel.set_permissions(defaultRole, overwrite=overwrite)
     
@@ -201,7 +212,7 @@ class Moderation(commands.Cog):
     
     await ctx.send(embed = randomEmbed)
   
-  #the globalkick command (for the owners only)
+  #The globalkick command (Owner commands only!)
   @commands.command()
   @commands.is_owner()
   async def globalkick(self, ctx, guild: Guild, user: User, *, reason = None):

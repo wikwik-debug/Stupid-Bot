@@ -1,5 +1,7 @@
-from  discord import User, Role, Member, AuditLogAction, Embed
+from  discord import Role, Member, AuditLogAction, Embed
 from discord.ext import commands
+from discord.ext.commands import MemberConverter
+from discord.ext.commands.errors import MemberNotFound
 
 import json
 from datetime import datetime
@@ -81,11 +83,11 @@ class Utilities(commands.Cog):
   #The whoadd command
   @commands.command()
   @commands.has_permissions(administrator = True)
-  async def whoadd(self, ctx, *, user: User):
+  async def whoadd(self, ctx, *, member: MemberConverter):
     guild = ctx.guild
     
     async for entries in guild.audit_logs(action=AuditLogAction.bot_add):
-      if entries.target.id == user.id:
+      if entries.target.id == member.id:
         entrisEmbed = Embed(
           title=f"{entries.target}",
           color=entries.target.color,
@@ -93,11 +95,16 @@ class Utilities(commands.Cog):
         )
         entrisEmbed.set_thumbnail(url=entries.target.avatar_url)
         entrisEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
-        
+
         entrisEmbed.add_field(name="Added by:", value=f"{entries.user.mention} (``{entries.user.id}``)", inline=False)
         entrisEmbed.add_field(name="Joined:", value=f"{entries.created_at.strftime('%A, %d %B %Y | %H:%M %p %Z')}", inline=True)
-        
+
         await ctx.send(embed=entrisEmbed)
+        return
+
+      elif member.id != entries.target.name:
+        await ctx.send("Test")
+        return
 
 def setup(bot):
   bot.add_cog(Utilities(bot))

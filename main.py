@@ -1,77 +1,74 @@
 import discord
-from discord import Embed, Status, Guild, Colour, AuditLogAction, User
+from discord import Embed, Status, Guild, Colour
 from discord.ext.commands import Bot
 from discord.utils import snowflake_time
 # from discord import app_commands
 
 import json
-from time import time
 import asyncio
-import requests
 import random
 from dotenv import load_dotenv
 import os
-from datetime import datetime
 from randomSentences import getRandomSentences
 
 def get_prefix(bot, message):
     with open("prefixes.json", "r") as f:
-      prefixes = json.load(f)
+        prefixes = json.load(f)
     return prefixes[f"{str(message.guild.name)}({str(message.guild.id)})"]
 
 def configure():
-  load_dotenv()
+    load_dotenv()
 
 intents = discord.Intents.all()
 
-bot = Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
+bot = Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True)
 bot.remove_command("help")
-
 
 @bot.command()
 async def salatiga(ctx):
-  message = await ctx.send("It is <@!727482301667213352>'s hometown")
-  await asyncio.sleep(5)
-  await message.edit(content="Tapi boong 😂 😂")
+    message = await ctx.send("It is <@!727482301667213352>'s hometown")
+    await asyncio.sleep(5)
+    await message.edit(content="Tapi boong 😂 😂")
 
 @bot.command()
 async def guilds(ctx):
-  for i in bot.guilds:
-    botGuildEmbed = Embed(
-      title=i.name,
-      color = Colour.random()
-    ) 
-    botGuildEmbed.set_thumbnail(url=i.owner.avatar_url)
-    botGuildEmbed.set_image(url=i.icon_url)
-    
-    botGuildEmbed.add_field(name="Server ID:", value=i.id, inline=False)
-    botGuildEmbed.add_field(name="Server Owner:", value=f"{i.owner} ({i.owner_id})", inline=True)
-    botGuildEmbed.add_field(name="Member Count:", value=i.member_count, inline=False)
+    for i in bot.guilds:
+        botGuildEmbed = Embed(
+            title=i.name,
+            color = Colour.random()
+        ) 
+        botGuildEmbed.set_thumbnail(url=i.owner.avatar_url)
+        botGuildEmbed.set_image(url=i.icon_url)
+        
+        botGuildEmbed.add_field(name="Server ID:", value=i.id, inline=False)
+        botGuildEmbed.add_field(name="Server Owner:", value=f"{i.owner} ({i.owner_id})", inline=True)
+        botGuildEmbed.add_field(name="Member Count:", value=i.member_count, inline=False)
 
-    await ctx.send(embed=botGuildEmbed)
+        await ctx.send(embed=botGuildEmbed)
 
 @bot.command()
 async def test(ctx):
-  await ctx.send(getRandomSentences())
+    await ctx.send(getRandomSentences())
 
 @bot.command()
 async def snow(ctx, id):
-  parsedResult = int(id)
-  timeFormatted = snowflake_time(parsedResult).strftime("Date: %A, %d %B %Y\nTime: %H:%M %p %Z")
-  await ctx.send(timeFormatted)
+    parsedResult = int(id)
+    timeFormatted = snowflake_time(parsedResult).strftime("Date: %A, %d %B %Y\nTime: %H:%M %p")
+    await ctx.send(timeFormatted)
 
 @bot.command()
 async def leave(ctx, guild: Guild = None):
-  fetchedGuild = await bot.fetch_guild(guild.id)
-  appinfo = await bot.application_info()
-  
-  if guild is None:
-    await ctx.reply("Pleave provide a guild/server to leave")
-  elif ctx.author != appinfo.owner:
-    await ctx.reply("You cant execute this command because your not the owner of the bot")
-  else:
-    await fetchedGuild.leave()
-    await ctx.send(f"I have left the guild called: {fetchedGuild.name} (`{fetchedGuild.id}`)")
+    fetchedGuild = await bot.fetch_guild(guild.id)
+    appinfo = await bot.application_info()
+
+    if guild is None:
+        await ctx.reply("Pleave provide a guild/server to leave")
+    elif ctx.author != appinfo.owner:
+        await ctx.reply("You cant execute this command because your not the owner of the bot")
+    else:
+        await fetchedGuild.leave()
+        await ctx.send(f"I have left the guild called: {fetchedGuild.name} (`{fetchedGuild.id}`)")
+
 
 # @bot.command()
 # async def load(ctx, extension):
@@ -97,37 +94,37 @@ async def leave(ctx, guild: Guild = None):
 
 
 async def ch_pr():
-  
-  await bot.wait_until_ready()
 
-  appinfo = await bot.application_info()
+    await bot.wait_until_ready()
 
-  botStatuses = [
-    f"{appinfo.owner}",
-    "discord.py",
-    "You're mom",
-    "Am pro",
-    "Simon Says",
-    "everything's go wrong",
-    f"{len(bot.guilds)} server's | b!help",
-    "Mr. Denjayu is a simp",
-    "overspeculation"
-  ]
+    appinfo = await bot.application_info()
 
-  activityType = [discord.ActivityType.watching, discord.ActivityType.streaming, discord.ActivityType.playing, discord.ActivityType.listening, discord.ActivityType.competing]
+    botStatuses = [
+        f"{appinfo.owner}",
+        "discord.py",
+        "You're mom",
+        "Am pro",
+        "Simon Says",
+        "everything's go wrong",
+        f"{len(bot.guilds)} server's | sb!help",
+        "Mr. Denjayu is a simp",
+        "overspeculation"
+    ]
 
-  while not bot.is_closed():
-      botStatus = random.choice(botStatuses)
-      botStatusType = random.choice(activityType)
+    activityType = [discord.ActivityType.watching, discord.ActivityType.streaming, discord.ActivityType.playing, discord.ActivityType.listening, discord.ActivityType.competing]
 
-      await bot.change_presence(activity=discord.Activity(type = botStatusType, name = botStatus))
+    while not bot.is_closed():
+        botStatus = random.choice(botStatuses)
+        botStatusType = random.choice(activityType)
 
-      await asyncio.sleep(25)
+        await bot.change_presence(activity=discord.Activity(type = botStatusType, name = botStatus))
+
+        await asyncio.sleep(25)
 
 
 for filename in os.listdir("./cogs"):
-  if filename.endswith(".py"):
-    bot.load_extension(f"cogs.{filename[:-3]}")
+    if filename.endswith(".py"):
+        bot.load_extension(f"cogs.{filename[:-3]}")
 
 
 bot.loop.create_task(ch_pr())

@@ -20,23 +20,22 @@ class Events(Cog):
         with open("prefixes.json", "r") as f:
             prefixes = json.load(f)
 
-        prefixes[f"{str(guild.name)}({str(guild.id)})"] = "b!"
+        prefixes[f"{str(guild.name)}({str(guild.id)})"] = "sb!"
 
         with open("prefixes.json", "w") as f:
             json.dump(prefixes, f, indent = 4)
-        
+
         async for entries in guild.audit_logs(limit=1, action=AuditLogAction.bot_add):
             general = find(lambda x : x.name == 'general',  guild.text_channels)
             chat = find(lambda x : x.name == "chat", guild.text_channels)
-            
+
             if entries.target.id == 881735007893336084:
                 if general and general.permissions_for(guild.me).send_messages:
                     await general.send(f"Thank you for inviting me! {entries.user.mention}")
-                    # return
 
                 elif chat and chat.permissions_for(guild.me).send_messages:
                     await chat.send(f"Thank you for inviting me! {entries.user.mention}")
-                    # return
+
 
     @Cog.listener() 
     async def on_guild_remove(self, guild):
@@ -124,4 +123,4 @@ class Events(Cog):
             raise error
 
 def setup(bot):
-  bot.add_cog(Events(bot))
+    bot.add_cog(Events(bot))
