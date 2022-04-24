@@ -72,21 +72,6 @@ async def leave(ctx, guild: Guild = None):
         await fetchedGuild.leave()
         await ctx.send(f"I have left the guild called: {fetchedGuild.name} (`{fetchedGuild.id}`)")
 
-@bot.command(name="da")
-async def discordApi(ctx, user: User):
-    header = {
-        "Authorization": f"Bot {os.getenv('TOKEN')}"
-    }
-    res = requests.get(f"https://discord.com/api/v9/users/{user.id}", headers=header)
-    data = json.loads(res.text)
-    
-    if data["avatar"].startswith("a_"):
-        await ctx.send("Is avatar animated? ``True``")
-        await ctx.send(f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.gif")
-    else:
-        await ctx.send("Is avatar animated? ``False``")
-        await ctx.send(f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.jpeg")
-
 
 # @bot.command()
 # async def load(ctx, extension):
