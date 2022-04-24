@@ -100,7 +100,7 @@ class Info(commands.Cog):
     embed.add_field(name="Server Boost Role", value=f'{serverBosterRole}', inline=False)
     embed.add_field(name="Highest Role", value=f'{guild.roles[-1].mention}', inline=False)
     embed.add_field(name="Total Roles", value=f'`{len(guild.roles)}`', inline=False)
-    # embed.add_field(name="Total Members", value=f'`{guild.member_count}`', inline=False)
+    embed.add_field(name="Total Members", value=f'`{guild.member_count}`', inline=False)
     embed.add_field(name="Total Channels", value=f'`{len(guild.channels)}`', inline=False)
     embed.add_field(name="Total Categories", value=f'`{len(guild.categories)}`', inline=False)
     embed.add_field(name="The server was created at:", value=guild.created_at.strftime("``Date: %A, %d %B %Y``\n``Time: %H:%M %p %Z``"), inline=False)
