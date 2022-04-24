@@ -1,5 +1,5 @@
 import discord
-from discord import User
+from discord import Member
 # from discord import PublicUserFlags
 from discord.ext import commands
 import requests
@@ -94,7 +94,7 @@ class Info(commands.Cog):
     embed.add_field(name="Server Name", value=f'`{guild.name}`', inline=False)
     embed.add_field(name="Server ID", value=f'`{guild.id}`', inline=False)
     embed.add_field(name="Server Description", value=f'`{(guild.description)}`', inline=False)
-    embed.add_field(name="Server Owner 👑", value=f'`{guild.owner}`', inline=False)
+    embed.add_field(name="Server Owner", value=f'`{guild.owner}`', inline=False)
     embed.add_field(name="Verify Level", value=f'`{guild.verification_level}`', inline=False)
     embed.add_field(name="Server Boost Level", value=f'`{guild.premium_tier}`', inline=False)
     embed.add_field(name="Server Boost Role", value=f'{serverBosterRole}', inline=False)
@@ -110,7 +110,7 @@ class Info(commands.Cog):
   
   #The whois command
   @commands.command()
-  async def whois(self, ctx, member: User = None):
+  async def whois(self, ctx, member: Member = None):
 
     member = ctx.author if not member else member
     

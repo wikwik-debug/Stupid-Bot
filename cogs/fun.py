@@ -101,7 +101,8 @@ class Fun(commands.Cog):
       title = f"**{user.name}'s avatar**",
       description=description,
       color = user.colour,
-      timestamp = ctx.message.created_at
+      timestamp = ctx.message.created_at,
+      url=f"https://discordapp.com/users/{data['id']}/"
     )
 
     avatarEmbed.set_image(url=user.avatar_url)
