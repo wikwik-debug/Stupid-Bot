@@ -1,5 +1,5 @@
 import discord
-# from discord import Guild as guild
+from discord import User
 # from discord import PublicUserFlags
 from discord.ext import commands
 import requests
@@ -110,7 +110,7 @@ class Info(commands.Cog):
   
   #The whois command
   @commands.command()
-  async def whois(self, ctx, member: discord.Member = None):
+  async def whois(self, ctx, member: User = None):
 
     member = ctx.author if not member else member
     

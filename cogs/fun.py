@@ -1,6 +1,7 @@
 import json
+from pydoc import describe
 import discord
-from discord import Member
+from discord import Member, User, Embed
 from discord.ext import commands
 
 import random
@@ -57,7 +58,7 @@ class Fun(commands.Cog):
         title = post["title"]
         url = post["url_overridden_by_dest"]
 
-        memeEmbed = discord.Embed(
+        memeEmbed = Embed(
           title = title
         )
         memeEmbed.set_image(url = url)
@@ -76,13 +77,30 @@ class Fun(commands.Cog):
   
   #The user/member avatar command
   @commands.command(aliases = ["av", "pfp"])
-  async def avatar(self, ctx, user: discord.User = None):
+  async def avatar(self, ctx, user: User = None):
   
     user = ctx.author if not user else user
-  
-    avatarEmbed = discord.Embed(
+
+    header = {
+      "Authorization": f"Bot {os.getenv('TOKEN')}"
+    }
+
+    res = requests.get(f"https://discord.com/api/v9/users/{user.id}", headers=header)
+    data = json.loads(res.text)
+    pngLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.png"
+    jpegLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.jpeg"
+    gifLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.gif"
+    webpLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.webp"
+    
+    if data["avatar"].startswith("a_"):
+      description = f"[``PNG``]({pngLink}) [``JPEG``]({jpegLink}) [``WEBP``]({webpLink}) [``GIF``]({gifLink})"
+    else:
+      description = f"[``PNG``]({pngLink}) [``JPEG``]({jpegLink}) [``WEBP``]({webpLink})"
+
+    avatarEmbed = Embed(
       title = f"**{user.name}'s avatar**",
-      color = ctx.author.color,
+      description=description,
+      color = user.colour,
       timestamp = ctx.message.created_at
     )
 

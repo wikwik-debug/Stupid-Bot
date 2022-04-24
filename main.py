@@ -1,5 +1,5 @@
 import discord
-from discord import Embed, Status, Guild, Colour
+from discord import Embed, Guild, Colour, User
 from discord.ext.commands import Bot
 from discord.utils import snowflake_time
 # from discord import app_commands
@@ -9,6 +9,9 @@ import asyncio
 import random
 from dotenv import load_dotenv
 import os
+import requests
+
+
 from randomSentences import getRandomSentences
 
 def get_prefix(bot, message):
@@ -68,6 +71,21 @@ async def leave(ctx, guild: Guild = None):
     else:
         await fetchedGuild.leave()
         await ctx.send(f"I have left the guild called: {fetchedGuild.name} (`{fetchedGuild.id}`)")
+
+@bot.command(name="da")
+async def discordApi(ctx, user: User):
+    header = {
+        "Authorization": f"Bot {os.getenv('TOKEN')}"
+    }
+    res = requests.get(f"https://discord.com/api/v9/users/{user.id}", headers=header)
+    data = json.loads(res.text)
+    
+    if data["avatar"].startswith("a_"):
+        await ctx.send("Is avatar animated? ``True``")
+        await ctx.send(f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.gif")
+    else:
+        await ctx.send("Is avatar animated? ``False``")
+        await ctx.send(f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.jpeg")
 
 
 # @bot.command()

@@ -177,7 +177,6 @@ class Moderation(commands.Cog):
     
     overwrite.send_messages = False
     overwrite.use_slash_commands = False
-    overwrite.view_channel = False
 
     await channel.set_permissions(defaultRole, overwrite=overwrite)
 
@@ -196,7 +195,6 @@ class Moderation(commands.Cog):
     overwrite = PermissionOverwrite()
     
     overwrite.send_messages = True
-    overwrite.view_channel = False
     
     await channel.set_permissions(defaultRole, overwrite=overwrite)
     
