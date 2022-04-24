@@ -105,6 +105,7 @@ class Fun(commands.Cog):
     )
 
     avatarEmbed.set_image(url=user.avatar_url)
+    avatarEmbed.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
 
     await ctx.send(embed = avatarEmbed)
 
