@@ -72,6 +72,16 @@ async def leave(ctx, guild: Guild = None):
         await fetchedGuild.leave()
         await ctx.send(f"I have left the guild called: {fetchedGuild.name} (`{fetchedGuild.id}`)")
 
+@bot.command()
+async def da(ctx):
+    header = {
+        "Authorization": f"Bot {os.getenv('TOKEN')}"
+    }
+
+    res = requests.get(f"https://discord.com/api/v9/guilds/722002048643497994", headers=header)
+    data = json.loads(res.text)
+    await ctx.send(data)
+
 
 # @bot.command()
 # async def load(ctx, extension):

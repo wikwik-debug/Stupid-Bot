@@ -87,28 +87,70 @@ class Fun(commands.Cog):
 
     res = requests.get(f"https://discord.com/api/v9/users/{user.id}", headers=header)
     data = json.loads(res.text)
-    pngLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.png"
-    jpegLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.jpeg"
-    gifLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.gif"
-    webpLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.webp"
+    
+    pngLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.png?size=1024"
+    jpegLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.jpeg?size=1024"
+    gifLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.gif?size=1024"
+    webpLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.webp?size=1024"
     
     if data["avatar"].startswith("a_"):
       description = f"[``PNG``]({pngLink}) [``JPEG``]({jpegLink}) [``WEBP``]({webpLink}) [``GIF``]({gifLink})"
     else:
       description = f"[``PNG``]({pngLink}) [``JPEG``]({jpegLink}) [``WEBP``]({webpLink})"
 
+    if "bot" in data:
+      url = ""
+    else:
+      url = f"https://discordapp.com/users/{data['id']}/"
+    
+    if data["banner_color"] is None:
+      color = user.color
+    else:
+      color = int(data["banner_color"].replace("#", "0x"), 16)
+
     avatarEmbed = Embed(
       title = f"**{user.name}'s avatar**",
-      description=description,
-      color = user.colour,
+      description = description,
+      color = color,
       timestamp = ctx.message.created_at,
-      url=f"https://discordapp.com/users/{data['id']}/"
+      url = url
     )
 
-    avatarEmbed.set_image(url=user.avatar_url)
+    avatarEmbed.set_image(url=f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.jpeg?size=1024")
     avatarEmbed.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
 
     await ctx.send(embed = avatarEmbed)
+    # await ctx.send(data)
+
+  #The user banner command
+  @commands.command(name="banner")
+  async def userBanner(self, ctx, user: User = None):
+    user = ctx.author if not user else user
+    
+    header = {
+      "Authorization": f"Bot {os.getenv('TOKEN')}"
+    }
+
+    res = requests.get(f"https://discord.com/api/v9/users/{user.id}", headers=header)
+    data = json.loads(res.text)
+    
+    if data["banner"] is None:
+      await ctx.send(f"{user.mention} doesnt have a banner")
+    else:
+      if data["banner"].startswith("a_"):
+        url = f"https://cdn.discordapp.com/banners/{data['id']}/{data['banner']}.gif?size=1024"
+      else:
+        url = f"https://cdn.discordapp.com/banners/{data['id']}/{data['banner']}.jpeg?size=1024"
+    
+    bannerEmbed = Embed(
+      title = f"{user.display_name}'s banner",
+      timestamp = ctx.message.created_at
+    )
+
+    bannerEmbed.set_image(url=url)
+    bannerEmbed.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+    
+    await ctx.send(embed=bannerEmbed)
 
   #The emojify command
   @commands.command()
