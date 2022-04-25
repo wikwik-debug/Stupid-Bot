@@ -9,10 +9,12 @@ import aiohttp
 import requests
 import os
 
+token = os.getenv("TOKEN")
 class Fun(commands.Cog):
 
   def __init__(self, bot):
     self.bot = bot
+
 
   #The 8ball command
   @commands.command(name="8ball")
@@ -82,7 +84,7 @@ class Fun(commands.Cog):
     user = ctx.author if not user else user
 
     header = {
-      "Authorization": f"Bot {os.getenv('TOKEN')}"
+      "Authorization": f"Bot {token}"
     }
 
     res = requests.get(f"https://discord.com/api/v9/users/{user.id}", headers=header)
@@ -128,7 +130,7 @@ class Fun(commands.Cog):
     user = ctx.author if not user else user
     
     header = {
-      "Authorization": f"Bot {os.getenv('TOKEN')}"
+      "Authorization": f"Bot {token}"
     }
 
     res = requests.get(f"https://discord.com/api/v9/users/{user.id}", headers=header)
