@@ -9,7 +9,8 @@ import aiohttp
 import requests
 import os
 
-token = os.getenv("TOKEN")
+token = os.getenv('TOKEN')
+
 class Fun(commands.Cog):
 
   def __init__(self, bot):
