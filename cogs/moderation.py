@@ -34,8 +34,13 @@ class Moderation(commands.Cog):
   @commands.command()
   @commands.has_permissions(ban_members = True)
   async def ban(self, ctx, member : MemberConverter, *, reason=None):
-    await member.ban(reason=reason)
-    await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
+    if member == ctx.author:
+      await ctx.send("You cannot ban yourself")
+    elif reason is None:
+      await ctx.reply("Please provide a reason to ban")
+    else:
+      await member.ban(reason=reason)
+      await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
 
   #The unban command
   @commands.command()

@@ -1,3 +1,4 @@
+from pydoc import describe
 from  discord import Role, Member, AuditLogAction, Embed
 from discord.ext import commands
 from discord.ext.commands import MemberConverter
@@ -27,34 +28,47 @@ class Utilities(commands.Cog):
   #The add role command
   @commands.command(pass_context = True)
   @commands.has_permissions(administrator = True)
-  async def addrole(self, ctx, role: Role = None, user: Member = None):
-
-    if role is  None:
-      await ctx.reply(">addrole **<role>** <user>")
-      # "Please select or mention a role to assign"
-    
+  async def addrole(self, ctx, user: Member = None, *roles: Role):
+    if len(roles) == 0:
+      await ctx.reply("Please select or mention a role to assign")
     elif user is None:
-      await ctx.reply(">addrole <role> **<user>**")
-      # Please mention or provide an id of a member
-    
-    elif role in user.roles:
-      await ctx.send(f"{user.mention} already has the role {role.mention}")
-    
-    else:
-      await user.add_roles(role)
-      await ctx.send(f'Successfully added the {role.mention} role to {user.mention}')
+      await ctx.reply("Please mention or provide an id of a member")
+
+    for role in roles:
+      totalRoles = totalRoles + roles[role]
+      
+      if role in user.roles:
+        errorAddRoleEmbed = Embed(
+          description = f"<a:DeniedBox:882782174208749608> {user.mention} already has the role {role.mention}",
+          color = 0xf04947
+        )
+        await ctx.send(embed = errorAddRoleEmbed)
+      else:
+        await user.add_roles(role)
+        AddRoleEmbed = Embed(
+          description = f"<a:ApprovedCheckBox:882777440609521724> {user.mention} has been added to the following role(s): {totalRoles.mention}",
+          color = 0x44b582
+        )
+        await ctx.send(embed = AddRoleEmbed)
   
   #The remove role command
   @commands.command(pass_context = True)
   @commands.has_permissions(administrator = True)
-  async def removerole(self, ctx, role: Role, user: Member):
-
-    if role in user.roles:
-      await user.remove_roles(role)
-      await ctx.send(f'Successfully removed the {role.mention} role from {user.mention}')
-
-    else:
-      await ctx.send(f'{user.mention} does not have the {role.mention} role')
+  async def removerole(self, ctx, user: Member, *roles: Role):
+    for role in roles:
+      if role in user.roles:
+        removeRoleEmbed = Embed(
+          description = f"<a:ApprovedCheckBox:882777440609521724> Successfully removed the {role.mention} role from {user.mention}",
+          color = 0x44b582
+        )
+        await user.remove_roles(role)
+        await ctx.send(embed=removeRoleEmbed)
+      else:
+        errorRemoveRoleEmbed = Embed(
+          description = f"<a:DeniedBox:882782174208749608> {user.mention} does not have the {role.mention} role",
+          color = 0xf04947
+        )
+        await ctx.send(embed = errorRemoveRoleEmbed)
   
   #The toggle command
   @commands.command(name = "toggle", description = "Enable or disable a command")
@@ -84,9 +98,7 @@ class Utilities(commands.Cog):
   @commands.command()
   @commands.has_permissions(administrator = True)
   async def whoadd(self, ctx, *, member: MemberConverter):
-    guild = ctx.guild
-    
-    async for entries in guild.audit_logs(action=AuditLogAction.bot_add):
+    async for entries in ctx.guild.audit_logs(action=AuditLogAction.bot_add):
       if entries.target.id == member.id:
         entrisEmbed = Embed(
           title=f"{entries.target}",
@@ -100,10 +112,6 @@ class Utilities(commands.Cog):
         entrisEmbed.add_field(name="Joined:", value=f"{entries.created_at.strftime('%A, %d %B %Y | %H:%M %p %Z')}", inline=True)
 
         await ctx.send(embed=entrisEmbed)
-        return
-
-      elif member.id != entries.target.name:
-        await ctx.send("Test")
         return
 
 def setup(bot):

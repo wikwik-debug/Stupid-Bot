@@ -39,5 +39,10 @@ class Bot(commands.Cog):
 
     await ctx.send(embed = botInfoEmbed)
 
+  #The bot source code command
+  @commands.command()
+  async def source(self, ctx):
+    await ctx.send("https://github.com/wikwik-debug/Stupid-Bot")
+
 def setup(bot):
   bot.add_cog(Bot(bot))

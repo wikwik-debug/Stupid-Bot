@@ -1,8 +1,8 @@
 import discord
-from discord import Embed, Guild, Colour, User
+from discord import Embed, Guild, Colour, Intents, Member, VoiceChannel
+from discord.ext import commands
 from discord.ext.commands import Bot
 from discord.utils import snowflake_time
-# from discord import app_commands
 
 import json
 import asyncio
@@ -10,7 +10,7 @@ import random
 from dotenv import load_dotenv
 import os
 import requests
-
+from pathlib import Path
 
 from randomSentences import getRandomSentences
 
@@ -19,12 +19,10 @@ def get_prefix(bot, message):
         prefixes = json.load(f)
     return prefixes[f"{str(message.guild.name)}({str(message.guild.id)})"]
 
-def configure():
+def configure() -> None:
     load_dotenv()
 
-intents = discord.Intents.all()
-
-bot = Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True)
+bot = Bot(command_prefix=get_prefix, intents=Intents.all(), case_insensitive=True, strip_after_prefix=True)
 bot.remove_command("help")
 
 @bot.command()
@@ -73,14 +71,9 @@ async def leave(ctx, guild: Guild = None):
         await ctx.send(f"I have left the guild called: {fetchedGuild.name} (`{fetchedGuild.id}`)")
 
 @bot.command()
-async def da(ctx):
-    header = {
-        "Authorization": f"Bot {os.getenv('TOKEN')}"
-    }
-
-    res = requests.get(f"https://discord.com/api/v9/guilds/722002048643497994", headers=header)
-    data = json.loads(res.text)
-    await ctx.send(data)
+async def log(ctx):
+    async for entries in ctx.guild.audit_logs():
+        await ctx.send(entries)
 
 
 # @bot.command()
@@ -106,8 +99,11 @@ async def da(ctx):
 #         bot.unload_extension(f"cogs.{extension}")
 
 
-async def ch_pr():
+for filename in os.listdir("./cogs"):
+    if filename.endswith(".py"):
+        bot.load_extension(f"cogs.{filename[:-3]}")
 
+async def ch_pr():
     await bot.wait_until_ready()
 
     appinfo = await bot.application_info()
@@ -133,12 +129,6 @@ async def ch_pr():
         await bot.change_presence(activity=discord.Activity(type = botStatusType, name = botStatus))
 
         await asyncio.sleep(25)
-
-
-for filename in os.listdir("./cogs"):
-    if filename.endswith(".py"):
-        bot.load_extension(f"cogs.{filename[:-3]}")
-
 
 bot.loop.create_task(ch_pr())
 configure()
