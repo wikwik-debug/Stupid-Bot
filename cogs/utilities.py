@@ -35,7 +35,6 @@ class Utilities(commands.Cog):
       await ctx.reply("Please mention or provide an id of a member")
 
     for role in roles:
-      totalRoles = totalRoles + roles[role]
       
       if role in user.roles:
         errorAddRoleEmbed = Embed(
@@ -46,7 +45,7 @@ class Utilities(commands.Cog):
       else:
         await user.add_roles(role)
         AddRoleEmbed = Embed(
-          description = f"<a:ApprovedCheckBox:882777440609521724> {user.mention} has been added to the following role(s): {totalRoles.mention}",
+          description = f"<a:ApprovedCheckBox:882777440609521724> {user.mention} has been added to the following role(s): {role.mention}",
           color = 0x44b582
         )
         await ctx.send(embed = AddRoleEmbed)

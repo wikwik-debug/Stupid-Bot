@@ -54,7 +54,7 @@ async def test(ctx):
 @bot.command()
 async def snow(ctx, id):
     parsedResult = int(id)
-    timeFormatted = snowflake_time(parsedResult).strftime("Date: %A, %d %B %Y\nTime: %H:%M %p")
+    timeFormatted = snowflake_time(parsedResult).strftime("Date: %A, %d %B %Y\nTime: %H:%M:%S %p")
     await ctx.send(timeFormatted)
 
 @bot.command()
@@ -70,10 +70,10 @@ async def leave(ctx, guild: Guild = None):
         await fetchedGuild.leave()
         await ctx.send(f"I have left the guild called: {fetchedGuild.name} (`{fetchedGuild.id}`)")
 
-@bot.command()
-async def log(ctx):
-    async for entries in ctx.guild.audit_logs():
-        await ctx.send(entries)
+@bot.command(name="gb")
+async def guildBanner(ctx, guild: Guild):
+    fetchedGuild = await bot.fetch_guild(guild.id)
+    await ctx.send(fetchedGuild.banner_url)
 
 
 # @bot.command()

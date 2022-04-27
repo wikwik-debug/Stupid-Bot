@@ -1,7 +1,9 @@
+from pydoc import describe
 import discord
-from discord import TextChannel, User, Embed, Guild, PermissionOverwrite, Member, AuditLogAction
+from discord import TextChannel, User, Embed, Guild, PermissionOverwrite, Member, Permissions, AuditLogAction
 from discord.ext import commands
 from discord.ext.commands import MemberConverter
+from discord.utils import get
 
 import asyncio
 
@@ -82,59 +84,115 @@ class Moderation(commands.Cog):
     await ctx.send(f"Nickname changed from ``{oldNickname}`` to ``{newNickname}``")
 
   class DurationConverter(commands.Converter):
-    async def convert(self, ctx, argument):
-      amount = argument[:-1]
-      unit = argument[-1]
+    async def convert(self, ctx, args):
+      amount = args[:-1]
+      unit = args[-1]
+      unitArr = ["d", "h", "m", "s"]
 
-      if amount.isdigit() and unit in ["h", "m", "s"]:
+      if amount.isdigit() and unit in unitArr:
         return (int(amount), unit)
 
-  #The mute command
+  # The mute command
   @commands.command()
   @commands.has_permissions(manage_messages = True)
   async def mute(self, ctx, member:Member, duration: DurationConverter, reason = None):
-    role = discord.utils.get(ctx.guild.roles, name="Muted")
+    role = get(ctx.guild.roles, name="Muted")
     guild = ctx.guild
 
-
     if role not in guild.roles:
-      perms = discord.Permissions(send_messages=False, speak=False)
+      perms = Permissions(send_messages=False, speak=False)
       
       await guild.create_role(name="Muted", permissions=perms)
         
-      multiplier = {"d": 86400, "h": 3600, "m": 60, "s": 1}
-      amount, unit = duration 
+      multiplierDict1 = {"d": 86400, "h": 3600, "m": 60, "s": 1}
+      amount, unit = duration
 
       await member.add_roles(role)
 
-      embed = Embed(
-        description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for {amount}{unit}",
-        color = 0x44b582
-      )
-
-      await ctx.send(embed = embed)
+      if unit == "s":
+        embed = Embed(
+          description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for ``{amount} Seconds``",
+          color = 0x44b582
+        )
+        await ctx.send(embed = embed)
       
-      await asyncio.sleep(amount * multiplier[unit])
+      elif unit == "m":
+        embed = Embed(
+          description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for ``{amount} Minutes``",
+          color = 0x44b582
+        )
+        await ctx.send(embed = embed)
+      
+      elif unit == "h":
+        embed = Embed(
+          description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for ``{amount} Hours``",
+          color = 0x44b582
+        )
+        await ctx.send(embed = embed)
+      
+      elif unit == "d":
+        embed = Embed(
+          description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for ``{amount} Day``",
+          color = 0x44b582
+        )
+        await ctx.send(embed = embed)
+        
+        if (amount, unit) == "1d":
+          embed = Embed(
+            description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for ``a Day``",
+            color = 0x44b582
+          )
+          await ctx.send(embed = embed)
+      
+      await asyncio.sleep(amount * multiplierDict1[unit])
       
       await member.remove_roles(role)
     
     elif reason is None:
-      await ctx.message.add_reaction("<a:DeniedBox:882782174208749608>") 
+      await ctx.message.add_reaction("<a:DeniedBox:882782174208749608>")
+    
+    elif role in member.roles:
+      errorEmbed = Embed(
+        description = f"<a:DeniedBox:882782174208749608> {member.mention} is already muted",
+        color = 0xff0000
+      )
+      await ctx.reply(embed = errorEmbed)
     
     else:
-      multiplier = {"d": 86400, "h": 3600, "m": 60, "s": 1}
+      multiplierDict2 = {"d": 86400, "h": 3600, "m": 60, "s": 1}
       amount, unit = duration 
         
       await member.add_roles(role)
-          
-      embed2 = Embed(
-        description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for {amount}{unit}",
-        color = 0x44b582
-      )
+
+      if unit == "s":
+        embed2 = Embed(
+          description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for ``{amount} Seconds```",
+          color = 0x44b582
+        )
+        await ctx.send(embed = embed2)
       
-      await ctx.send(embed = embed2)
+      elif unit == "m":
+        embed2 = Embed(
+          description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for ``{amount} Minutes``",
+          color = 0x44b582
+        )
+        await ctx.send(embed = embed2)
       
-      await asyncio.sleep(amount * multiplier[unit])
+      elif unit == "h":
+        embed2 = Embed(
+          description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for ``{amount} Hours``",
+          color = 0x44b582
+        )
+        await ctx.send(embed = embed2)
+
+      elif unit == "d":
+        embed2 = Embed(
+          description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been muted for ``{amount} Day``",
+          color = 0x44b582
+        )
+        await ctx.send(embed = embed2)
+
+      await asyncio.sleep(amount *  multiplierDict2[unit])
       
       await member.remove_roles(role)
 
@@ -145,14 +203,19 @@ class Moderation(commands.Cog):
   async def unmute(self, ctx, member:Member):
     role = discord.utils.get(ctx.guild.roles, name="Muted")
 
-    await member.remove_roles(role)
-
-    embed3 = Embed(
-          description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been unmuted",
-          color = 0x44b582
-        )
-
-    await ctx.send(embed = embed3)
+    if role not in member.roles:
+      roleErrorEmbed = Embed(
+        description = f"<a:DeniedBox:882782174208749608> {member.mention} haven't been muted",
+        color = 0xff0000
+      )
+      await ctx.reply(embed = roleErrorEmbed)
+    else:
+      roleEmbed = Embed(
+        description = f"<a:ApprovedCheckBox:901378101605445642> {member.mention} have been unmuted",
+        color = 0x44b582
+      )
+      await member.remove_roles(role)
+      await ctx.send(embed = roleEmbed)
 
   #The slowmode command
   @commands.command()
@@ -225,10 +288,10 @@ class Moderation(commands.Cog):
   @commands.command()
   async def random(self, ctx):
     colour = discord.Colour
-    
+    var = "Hello!"
     randomEmbed = Embed(
       title = "random",
-      description = "This is random",
+      description = f"<a:ApprovedCheckBox:901378101605445642> {ctx.author.mention} This is random ``{var}``",
       color = colour.random()
     )
     

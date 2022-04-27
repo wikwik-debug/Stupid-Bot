@@ -43,6 +43,10 @@ class Bot(commands.Cog):
   @commands.command()
   async def source(self, ctx):
     await ctx.send("https://github.com/wikwik-debug/Stupid-Bot")
+  
+  @commands.command()
+  async def invite(self, ctx):
+    await ctx.send("You can invite me by clicking on this link: https://dsc.gg/stupid-bot")
 
 def setup(bot):
   bot.add_cog(Bot(bot))
