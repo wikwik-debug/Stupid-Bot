@@ -1,5 +1,7 @@
+from datetime import datetime
+from pydoc import describe
 import discord
-from discord import Embed, Guild, Colour, Intents, Member, VoiceChannel
+from discord import Embed, Guild, Colour, Intents, Member, User, VoiceChannel
 from discord.ext import commands
 from discord.ext.commands import Bot
 from discord.utils import snowflake_time
@@ -11,6 +13,7 @@ from dotenv import load_dotenv
 import os
 import requests
 from pathlib import Path
+from datetime import datetime
 
 from randomSentences import getRandomSentences
 
@@ -24,6 +27,20 @@ def configure() -> None:
 
 bot = Bot(command_prefix=get_prefix, intents=Intents.all(), case_insensitive=True, strip_after_prefix=True)
 bot.remove_command("help")
+
+snipe_message_content = None
+snipe_message_author = None
+
+@bot.event
+async def on_message_delete(message):
+    global snipe_message_content
+    global snipe_message_author
+
+    snipe_message_content = message.content
+    snipe_message_author = message.author.name
+    await asyncio.sleep(60)
+    snipe_message_content = None
+    snipe_message_author = None
 
 @bot.command()
 async def salatiga(ctx):
@@ -74,6 +91,46 @@ async def leave(ctx, guild: Guild = None):
 async def guildBanner(ctx, guild: Guild):
     fetchedGuild = await bot.fetch_guild(guild.id)
     await ctx.send(fetchedGuild.banner_url)
+
+@bot.command()
+async def iplookup(ctx, ipAddress:str = "9.9.9.9"):
+    res = requests.get(f"https://extreme-ip-lookup.com/json/{ipAddress}?key={os.getenv('IP_API')}")
+    data = res.json()
+    em = Embed()
+    fields = [
+        {"name": "IP", "value": data["query"]},
+        {"name": "IP Type", "value": data["ipType"]},
+        {"name": "Country", "value": data["country"]},
+        {"name": "City", "value": data["city"]},
+        {"name": "Continent", "value": data["continent"]},
+        {"name": "IP Name", "value": data["ipName"]},
+        {"name": "ISP", "value": data["isp"]},
+        {"name": "Latitute", "value": data["lat"]},
+        {"name": "Longitute", "value": data["lon"]},
+        {"name": "Organization", "value": data["org"]},
+        {"name": "Business", "value": data["businessName"]},
+        {"name": "Region", "value": data["region"]}
+    ]
+    for field in fields:
+        if field["value"]:
+            em.set_footer(text="\u200b")
+            em.timestamp = datetime.utcnow()
+            em.add_field(name=field["name"], value=field["value"], inline=True)
+    return await ctx.send(embed = em)
+
+@bot.command()
+async def snipe(message):
+    if snipe_message_content == None:
+        await message.channel.send("No message to snipe!")
+    else:
+        snipeEmbed = Embed(
+            description = f"{snipe_message_content}",
+            color = Colour.random()
+        )
+        snipeEmbed.set_footer(text=f"Requested by {message.author}")
+        snipeEmbed.set_author(name=f"Sniped the message deleted by {snipe_message_author}")
+        await message.channel.send(embed = snipeEmbed)
+
 
 
 # @bot.command()

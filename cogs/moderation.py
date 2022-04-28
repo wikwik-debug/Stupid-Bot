@@ -56,7 +56,15 @@ class Moderation(commands.Cog):
   @commands.command()
   @commands.has_permissions(manage_messages = True)
   async def clear(self, ctx, amount: int):
-    await ctx.channel.purge(limit = amount)
+    if amount == "reset":
+      await ctx.channel.edit(slowmode_delay=0)
+      await ctx.send("The slomode have been turned off")
+    elif amount is None:
+      await ctx.reply("Please specify a value to slowmode")
+    else:
+      if isinstance(amount, str):
+        amount = int(amount)
+      await ctx.channel.purge(limit = amount)
   
   #The nickname command
   @commands.command(aliases = ["changeNick"])
@@ -229,7 +237,6 @@ class Moderation(commands.Cog):
     else:
       if isinstance(seconds, str):
         seconds = int(seconds)
-
       await ctx.channel.edit(slowmode_delay=seconds)
       await ctx.send(f'The slowmode have been set to ``{seconds}`` seconds')
 

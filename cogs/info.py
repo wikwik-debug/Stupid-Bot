@@ -24,7 +24,7 @@ class Info(commands.Cog):
     embed = discord.Embed(title = "My list of commands", description = "Ping me if you don't know my prefix", colour = 0xffffff)
     embed.add_field(name = "Moderation Commands", value = "``ban`` ``unban`` ``kick`` ``slowmode`` ``nickname`` ``mute`` ``unmute`` ``purge`` ``lock`` ``unlock`` ``channelban``", inline = False)
     embed.add_field(name = "Info Commands", value = "``whois`` ``serverinfo`` ``botinfo`` ``covid`` ``emojiinfo`` ``numberinfo``", inline = False)
-    embed.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say`` ``catgif`` ``tweet``", inline = False)
+    embed.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say`` ``catgif`` ``tweet`` ``fact`` ``owoify``", inline = False)
     embed.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle`` ``whoadd``", inline = False)
     embed.add_field(name = "Miscellaneous Commands", value = "``run``", inline = False)
 
@@ -113,11 +113,33 @@ class Info(commands.Cog):
   async def whois(self, ctx, member: Member = None):
 
     member = ctx.author if not member else member
+    guild = ctx.guild
     
     roles = [role.mention for role in member.roles[::-1]]
     roles.pop()
 
     is_bot = "Yes" if member.bot else "No"
+    
+    if guild.owner_id == member.id:
+      is_guild_owner = "Yes"
+    else:
+      is_guild_owner = "No"
+    
+    if member.nick is None:
+      nickname = member.name
+    else:
+      nickname = member.nick
+    
+    if member.raw_status == "online":
+      memberStatus = "<:Online:909327079101837362>"
+    elif member.raw_status == "dnd":
+      memberStatus = "<:Do_not_disturb:909327092016095252>"
+    elif member.raw_status == "idle":
+      memberStatus = "<:Idle:909327106448699402>"
+    elif member.raw_status == "offline":
+      memberStatus = "<:Offline:909327118146617384>"
+    # elif member.raw_status == "invisible":
+    #   memberStatus = "<:Offline:909327118146617384>"
 
     embed = discord.Embed(colour = member.color, timestamp = ctx.message.created_at)
 
@@ -126,18 +148,26 @@ class Info(commands.Cog):
   
   
     embed.add_field(name="Username", value = f"``{member.name}#{member.discriminator}``", inline=False)
-    embed.add_field(name="User's server nickname", value=f"``{member.nick}``", inline=False)
-    
+    embed.add_field(name="User's server nickname", value=f"``{nickname}``", inline=False)
     embed.add_field(name="ID", value=f"``{member.id}``", inline=False)
-    embed.add_field(name="User's status", value=f"``{member.status}``", inline=False)
-    embed.add_field(name = "User's activity", value = f"``{member.activity}``", inline = False)
 
-    embed.add_field(name="Created at:", value = f"``{member.created_at.strftime('%m/%d/%Y, %H:%M:%S')}``", inline=True)
-    embed.add_field(name="Joined the server at:", value = f"``{member.joined_at.strftime('%m/%d/%Y, %H:%M:%S')}``", inline=False)
+    if member.bot == True:
+      embed.add_field(name="User's status", value=f"{memberStatus}", inline=False)
+    else:
+      embed.add_field(name="User's status", value=f"{memberStatus}", inline=False)
+      embed.add_field(name = "User's activity", value = f"``{member.activity}``", inline = False)
 
-    embed.add_field(name=f'Roles ({len(member.roles[::-1])})', value =" ".join(roles), inline=False)
+    embed.add_field(name="Created at:", value = f"``{member.created_at.strftime('%m/%d/%Y, %H:%M %p')}``", inline=True)
+    embed.add_field(name="Joined the server at:", value = f"``{member.joined_at.strftime('%m/%d/%Y, %H:%M %p')}``", inline=False)
+    
+    embed.add_field(name=f'Roles ({len(roles)})', value="  ".join(roles), inline=False)
 
-    embed.add_field(name="Is this user a bot?", value = f"``{is_bot}``", inline=False)
+    if member.bot == True:
+      embed.add_field(name="Is this user a bot?", value = f"``{is_bot}``", inline=False)
+    else:
+      embed.add_field(name="Is this user a bot?", value = f"``{is_bot}``", inline=False)
+      embed.add_field(name="Is this user the server owner?", value = f"``{is_guild_owner}``", inline=False)
+
 
 
     await ctx.send(embed=embed)

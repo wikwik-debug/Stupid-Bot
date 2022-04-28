@@ -19,7 +19,7 @@ class Nsfw(commands.Cog):
             url=data["message"],
             title="<:NSFW:962289749954027571> Pussy",
             color = 0xffffff,
-            timestamp = datetime.now()
+            timestamp = datetime.utcnow()
         )
         
         if ctx.channel.nsfw == True:
@@ -41,7 +41,7 @@ class Nsfw(commands.Cog):
             url=data["message"],
             title="<:NSFW:962289749954027571> Boobs",
             color = 0xffffff,
-            timestamp = datetime.now()
+            timestamp = datetime.utcnow()
         )
         if ctx.channel.nsfw == True:
             imageUrl = data["message"]
@@ -62,7 +62,7 @@ class Nsfw(commands.Cog):
             url=data["message"],
             title="<:NSFW:962289749954027571> Ass",
             color = 0xffffff,
-            timestamp = datetime.now()
+            timestamp = datetime.utcnow()
         )
         if ctx.channel.nsfw == True:
             imageUrl = data["message"]
@@ -83,7 +83,7 @@ class Nsfw(commands.Cog):
             url=data["message"],
             title="<:NSFW:962289749954027571> 4k",
             color = 0xffffff,
-            timestamp = datetime.now()
+            timestamp = datetime.utcnow()
         )
         if ctx.channel.nsfw == True:
             imageUrl = data["message"]
@@ -104,7 +104,7 @@ class Nsfw(commands.Cog):
             url=data["message"],
             title="<:NSFW:962289749954027571> Hentai",
             color = 0xffffff,
-            timestamp = datetime.now()
+            timestamp = datetime.utcnow()
         )
         if ctx.channel.nsfw == True:
             imageUrl = data["message"]
@@ -125,7 +125,7 @@ class Nsfw(commands.Cog):
             url=data["message"],
             title="<:NSFW:962289749954027571> Anal",
             color = 0xffffff,
-            timestamp = datetime.now()
+            timestamp = datetime.utcnow()
         )
         if ctx.channel.nsfw == True:
             imageUrl = data["message"]
@@ -146,7 +146,7 @@ class Nsfw(commands.Cog):
             url=data["message"],
             title="<:NSFW:962289749954027571> Gonewild",
             color = 0xffffff,
-            timestamp = datetime.now()
+            timestamp = datetime.utcnow()
         )
         if ctx.channel.nsfw == True:
             imageUrl = data["message"]
@@ -167,7 +167,7 @@ class Nsfw(commands.Cog):
             url=data["message"],
             title="<:NSFW:962289749954027571> Paizuri",
             color = 0xffffff,
-            timestamp = datetime.now()
+            timestamp = datetime.utcnow()
         )
         if ctx.channel.nsfw == True:
             imageUrl = data["message"]
@@ -188,7 +188,7 @@ class Nsfw(commands.Cog):
             url=data["message"],
             title="<:NSFW:962289749954027571> Thigh",
             color = 0xffffff,
-            timestamp = datetime.now()
+            timestamp = datetime.utcnow()
         )
         if ctx.channel.nsfw == True:
             imageUrl = data["message"]

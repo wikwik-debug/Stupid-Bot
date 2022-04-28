@@ -3,6 +3,7 @@ from pydoc import describe
 import discord
 from discord import Member, User, Embed
 from discord.ext import commands
+from discord.ext.commands import Context, Cog
 
 
 import random
@@ -10,7 +11,7 @@ import aiohttp
 import requests
 import os
 
-class Fun(commands.Cog):
+class Fun(Cog):
 
   def __init__(self, bot):
     self.bot = bot
@@ -19,33 +20,23 @@ class Fun(commands.Cog):
   #The 8ball command
   @commands.command(name="8ball")
   async def _8ball(self, ctx, *, question):
-    responses = [ "As I see it, yes.",
-                "Oh hell yes.",
-                "Ask again later.",
-                "Better not tell you now.",
-                "Cannot predict now.",
-                "Concentrate and ask again.",
-                "Don’t count on it.",
-                "It is certain.",
-                "It is decidedly so.", 
-                "Most likely.",
-                "My reply is no.",
-                "My sources say no.",
-                "Outlook not so good.",
-                "Outlook good.",
-                "Reply hazy, try again.",
-                "Signs point to yes.",
-                "Very doubtful.",
-                "Oh hell no.",
-                "Without a doubt.",
-                "Yes.", 
-                "Yes – definitely.",
-                "You may rely on it."]
-    await ctx.reply(f"{random.choice(responses)}")
+    res = requests.get("https://nekos.life/api/v2/img/8ball")
+    data = res.json()
+    _8ballEmbed = Embed(
+      title = "8ball",
+      color = 0xffffff
+    )
+    
+    _8ballEmbed.set_image(url=data["url"])
+    
+    await ctx.send(embed = _8ballEmbed)
+    
+    messageArr = []
+    messageArr.append(question)
   
   #The meme command
   @commands.command()
-  async def meme(self, ctx: commands.Context):
+  async def meme(self, ctx: Context):
     async with aiohttp.ClientSession() as session:
       # listOfUrls = ["https://www.reddit.com/r/memes/hot.json", "https://www.reddit.com/r/dankmemes/top.json?t=all"]
       
@@ -118,11 +109,10 @@ class Fun(commands.Cog):
       url = url
     )
 
-    avatarEmbed.set_image(url=f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.jpeg?size=1024")
+    avatarEmbed.set_image(url=user.avatar_url)
     avatarEmbed.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
 
     await ctx.send(embed = avatarEmbed)
-    # await ctx.send(data)
 
   #The user banner command
   @commands.command(name="banner")
@@ -140,16 +130,22 @@ class Fun(commands.Cog):
       await ctx.send(f"{user.mention} doesnt have a banner")
     else:
       if data["banner"].startswith("a_"):
-        url = f"https://cdn.discordapp.com/banners/{data['id']}/{data['banner']}.gif?size=1024"
+        bannerUrl = f"https://cdn.discordapp.com/banners/{data['id']}/{data['banner']}.gif?size=1024"
       else:
-        url = f"https://cdn.discordapp.com/banners/{data['id']}/{data['banner']}.jpeg?size=1024"
+        bannerUrl = f"https://cdn.discordapp.com/banners/{data['id']}/{data['banner']}.jpeg?size=1024"
+    
+    if "bot" in data:
+      url = ""
+    else:
+      url = f"https://discordapp.com/users/{data['id']}/"
     
     bannerEmbed = Embed(
       title = f"{user.display_name}'s banner",
-      timestamp = ctx.message.created_at
+      timestamp = ctx.message.created_at,
+      url=url
     )
 
-    bannerEmbed.set_image(url=url)
+    bannerEmbed.set_image(url=bannerUrl)
     bannerEmbed.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
     
     await ctx.send(embed=bannerEmbed)
@@ -202,6 +198,7 @@ class Fun(commands.Cog):
   async def say(self, ctx, *, message):
     await ctx.send(message)
   
+  #The dog command
   @commands.command()
   async def dog(self, ctx):
     url = "https://dog.ceo/api/breeds/image/random"
@@ -209,6 +206,7 @@ class Fun(commands.Cog):
     data = json.loads(response.text)
     await ctx.send(data["message"])
   
+  #The catgif command
   @commands.command()
   async def catgif(self, ctx):
     url = "https://api.thecatapi.com/v1/images/search?mime_types=gif"
@@ -218,6 +216,19 @@ class Fun(commands.Cog):
     response = requests.get(url, headers=header)
     data = json.loads(response.text)
     await ctx.send(data[0]["url"])
+  
+  #the fact command
+  @commands.command(aliases=["facts"])
+  async def fact(self, ctx):
+    res = requests.get("https://nekos.life/api/v2/fact")
+    data = res.json()
+    await ctx.reply(data["fact"])
+
+  @commands.command()
+  async def owoify(self, ctx, *, message:str):
+    res = requests.get(f"https://nekos.life/api/v2/owoify?text={message}")
+    data = res.json()
+    await ctx.reply(data["owo"])
 
 def setup(bot):
   bot.add_cog(Fun(bot))

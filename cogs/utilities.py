@@ -35,7 +35,6 @@ class Utilities(commands.Cog):
       await ctx.reply("Please mention or provide an id of a member")
 
     for role in roles:
-      
       if role in user.roles:
         errorAddRoleEmbed = Embed(
           description = f"<a:DeniedBox:882782174208749608> {user.mention} already has the role {role.mention}",
