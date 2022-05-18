@@ -5,6 +5,7 @@ from discord.ext.commands import Cog
 from discord.utils import find
 
 import json
+import requests
 
 class Events(Cog):
     def __init__(self, bot):
@@ -84,6 +85,14 @@ class Events(Cog):
 
         with open("prefixes.json", "w") as f:
             json.dump(prefixes, f, indent = 4)
+        
+        post_url = "http://localhost:5000/utils/addNewPrefix"
+        payload = {
+            "serverID": guild.id,
+            "serverName": guild.name
+        }
+        res = requests.post(post_url, json=payload)
+        print(res.status_code)
 
         async for entries in guild.audit_logs(limit=1, action=AuditLogAction.bot_add):
             general = find(lambda x : x.name == 'general',  guild.text_channels)

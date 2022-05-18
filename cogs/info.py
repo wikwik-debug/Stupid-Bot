@@ -1,6 +1,4 @@
-import discord
-from discord import Member
-# from discord import PublicUserFlags
+from discord import Member, Colour, Embed, NotFound, Emoji
 from discord.ext import commands
 import requests
 import json
@@ -8,9 +6,10 @@ import datetime
 import phonenumbers
 from phonenumbers import carrier, geocoder, timezone
 import os
+import time
+import dateutil.parser as dt
 
 
-from main import configure
 from weather import parse_data
 
 class Info(commands.Cog):
@@ -21,12 +20,14 @@ class Info(commands.Cog):
   #The help command
   @commands.command()
   async def help(self, ctx):
-    embed = discord.Embed(title = "My list of commands", description = "Ping me if you don't know my prefix", colour = 0xffffff)
+    embed = Embed(title = "My list of commands",  colour = 0xffffff)
     embed.add_field(name = "Moderation Commands", value = "``ban`` ``unban`` ``kick`` ``slowmode`` ``nickname`` ``mute`` ``unmute`` ``purge`` ``lock`` ``unlock`` ``channelban``", inline = False)
     embed.add_field(name = "Info Commands", value = "``whois`` ``serverinfo`` ``botinfo`` ``covid`` ``emojiinfo`` ``numberinfo``", inline = False)
     embed.add_field(name = "Fun Commands", value = "``8ball`` ``avatar`` ``Konnichiwa`` ``meme`` ``emojify`` ``say`` ``catgif`` ``tweet`` ``fact`` ``owoify``", inline = False)
     embed.add_field(name = "Utilities Commands", value = "``changeprefix`` ``addrole`` ``removerole`` ``toggle`` ``whoadd``", inline = False)
     embed.add_field(name = "Miscellaneous Commands", value = "``run``", inline = False)
+
+    embed.set_footer(text="Ping me if you don't know my prefix")
 
     await ctx.send(embed = embed)
   
@@ -35,7 +36,7 @@ class Info(commands.Cog):
   async def covid(self, ctx, *, countryName = None):
           try:
               if countryName is None:
-                  embed=discord.Embed(title="This command is used like this: ```b!covid [country]```", colour=ctx.author.color)
+                  embed=Embed(title="This command is used like this: ```b!covid [country]```", colour=ctx.author.color)
                   await ctx.send(embed=embed)
 
               else:
@@ -55,7 +56,7 @@ class Info(commands.Cog):
                   totalTests = json_stats["totalTests"]
                   testsPerOneMillion = json_stats["testsPerOneMillion"]
 
-                  embed2 = discord.Embed(title=f"**COVID-19 Status Of {country}**!", description="This Information Isn't Live Always, Hence It May Not Be Accurate!", colour=ctx.author.color)
+                  embed2 = Embed(title=f"**COVID-19 Status Of {country}**!", description="This Information Isn't Live Always, Hence It May Not Be Accurate!", colour=ctx.author.color)
                   embed2.add_field(name="**Total Cases**", value=totalCases, inline=True)
                   embed2.add_field(name="**Today Cases**", value=todayCases, inline=True)
                   embed2.add_field(name="**Total Deaths**", value=totalDeaths, inline=True)
@@ -72,7 +73,7 @@ class Info(commands.Cog):
                   await ctx.send(embed=embed2)
 
           except:
-              embed3 = discord.Embed(title="Invalid Country Name Or API Error! Try Again..!", colour=ctx.author.color)
+              embed3 = Embed(title="Invalid Country Name Or API Error! Try Again..!", colour=ctx.author.color)
               embed3.set_author(name="Error!")
               await ctx.send(embed=embed3)
   
@@ -82,7 +83,7 @@ class Info(commands.Cog):
     guild = ctx.guild if guildID is None else await self.bot.fetch_guild(guildID)
     serverBosterRole = "``None``" if guild.premium_subscriber_role is None else guild.premium_subscriber_role
     
-    embed = discord.Embed(
+    embed = Embed(
       title = "Server information",
       color = 0xffffff
     )
@@ -141,7 +142,7 @@ class Info(commands.Cog):
     # elif member.raw_status == "invisible":
     #   memberStatus = "<:Offline:909327118146617384>"
 
-    embed = discord.Embed(colour = member.color, timestamp = ctx.message.created_at)
+    embed = Embed(colour = member.color, timestamp = ctx.message.created_at)
 
     embed.set_thumbnail(url=member.avatar_url)
     embed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
@@ -174,14 +175,14 @@ class Info(commands.Cog):
   
   #The emojiinfo command
   @commands.command(name = "emojiinfo", aliases = ["ai"])
-  async def emoji_info(self, ctx, emoji: discord.Emoji = None):
+  async def emoji_info(self, ctx, emoji: Emoji = None):
     if not emoji:
       return await ctx.invoke(self.bot.get_command("help"))
     
     try:
       emoji = await emoji.guild.fetch_emoji(emoji.id)
     
-    except discord.NotFound:
+    except NotFound:
       return await ctx.send("I could not find this emoji in the given guild")
     
     is_managed = "Yes" if emoji.managed else "No"
@@ -207,9 +208,9 @@ class Info(commands.Cog):
     **- Guild ID:** {emoji.guild.id}
     """
     
-    colour = discord.Colour
+    colour = Colour
     
-    emojiEmbed = discord.Embed(
+    emojiEmbed = Embed(
       title = f"**Emoji Information for:** `{emoji.name}`",
       description=description,
       color = colour.random()
@@ -223,7 +224,7 @@ class Info(commands.Cog):
     
     number = phonenumbers.parse(number)
 
-    colour = discord.Colour
+    colour = Colour
 
     valid_number = "Yes" if phonenumbers.is_valid_number(number) else "No"
 
@@ -234,7 +235,7 @@ class Info(commands.Cog):
     **- Valid phone number:** ``{valid_number}``
     """
 
-    numEmbed = discord.Embed(
+    numEmbed = Embed(
       title = f"Phone number information for: `{phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.NATIONAL)}`",
       description = description,
       color = colour.random()
@@ -261,11 +262,11 @@ class Info(commands.Cog):
       "grnd_level": "Ground level"
     }
       
-    colour = discord.Colour
+    colour = Colour
       
     location = location.title()
           
-    weatherEmbed = discord.Embed(
+    weatherEmbed = Embed(
       title = f"{location} weather",
       description = f"Here is the data for {location}.",
       colour = colour.random()
@@ -275,7 +276,64 @@ class Info(commands.Cog):
       weatherEmbed.add_field(name = aliases[key], value = str(data[key]), inline = False)
           
     await ctx.send(embed = weatherEmbed)
+  
+  @commands.command()
+  async def gameinfo(self, ctx, placeID:int):
+    universeID = requests.get(f"https://api.roblox.com/universes/get-universe-containing-place?placeid={placeID}")
+    universeID_data = universeID.json()
+    
+    gameInfo = requests.get(f"https://games.roblox.com/v1/games?universeIds={universeID_data['UniverseId']}")
+    gameInfo_data = gameInfo.json()
 
+    groupInfo = requests.get(f"https://groups.roblox.com/v1/groups/{gameInfo_data['data'][0]['creator']['id']}")
+    groupInfo_data = groupInfo.json()
+
+    thumbnail = requests.get(f"https://thumbnails.roblox.com/v1/games/icons?universeIds={universeID_data['UniverseId']}&size=512x512&format=jpeg&isCircular=false")
+    thumbnail_data = thumbnail.json()
+
+    gameUrl = f"https://www.roblox.com/games/{gameInfo_data['data'][0]['rootPlaceId']}"
+
+    if gameInfo_data['data'][0]['creator']['type'] == "Group":
+      creator = f"{groupInfo_data['owner']['username']} ({gameInfo_data['data'][0]['creator']['name']})"
+      creatorUrl = f"https://www.roblox.com/groups/{groupInfo_data['id']}"
+    else:
+      creator = gameInfo_data['data'][0]['creator']['name']
+      creatorUrl = f"https://www.roblox.com/users/{gameInfo_data['data'][0]['creator']['id']}"
+    
+    createdDateTimeString = gameInfo_data['data'][0]['created']
+    createdDateTimeformatted = dt.parse(createdDateTimeString)
+    createdUnixtime = time.mktime(createdDateTimeformatted.timetuple())
+
+    updatedDateTimeString = gameInfo_data['data'][0]['updated']
+    updatedDateTimeformatted = dt.parse(updatedDateTimeString)
+    updatedUnixtime = time.mktime(updatedDateTimeformatted.timetuple())
+
+    description = f"""
+    **Name:**
+    [``{gameInfo_data['data'][0]['sourceName']}``]({gameUrl})
+    
+    **Creator:**
+    [``{creator}``]({creatorUrl})
+    
+    **Visits:**
+    ``{format(gameInfo_data['data'][0]['visits'], ',')}``
+
+    **Created At:**
+    {createdDateTimeformatted.strftime('%A, %d %B %Y')}  (<t:{round(createdUnixtime)}:R>)
+
+    **Updated At:**
+    {updatedDateTimeformatted.strftime('%A, %d %B %Y')}  (<t:{round(updatedUnixtime)}:R>)
+    """
+
+    embed = Embed(
+      title="Roblox Game Info",
+      description=description,
+      colour = Colour.random()
+    )
+    
+    embed.set_thumbnail(url=thumbnail_data["data"][0]["imageUrl"])
+
+    await ctx.send(embed = embed)
 
 def setup(bot):
   bot.add_cog(Info(bot))

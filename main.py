@@ -1,7 +1,8 @@
 from datetime import datetime
 from pydoc import describe
+from tokenize import group
 import discord
-from discord import Embed, Guild, Colour, Intents, Member, User, VoiceChannel
+from discord import Embed, Guild, Colour, Intents, Member, User, File
 from discord.ext import commands
 from discord.ext.commands import Bot
 from discord.utils import snowflake_time
@@ -12,18 +13,20 @@ import random
 from dotenv import load_dotenv
 import os
 import requests
-from pathlib import Path
 from datetime import datetime
+import aiohttp
+from bs4 import BeautifulSoup
+import dateutil.parser as dt
+import time
 
 from randomSentences import getRandomSentences
+
+load_dotenv()
 
 def get_prefix(bot, message):
     with open("prefixes.json", "r") as f:
         prefixes = json.load(f)
     return prefixes[f"{str(message.guild.name)}({str(message.guild.id)})"]
-
-def configure() -> None:
-    load_dotenv()
 
 bot = Bot(command_prefix=get_prefix, intents=Intents.all(), case_insensitive=True, strip_after_prefix=True)
 bot.remove_command("help")
@@ -65,7 +68,7 @@ async def guilds(ctx):
         await ctx.send(embed=botGuildEmbed)
 
 @bot.command()
-async def test(ctx):
+async def randomSentence(ctx):
     await ctx.send(getRandomSentences())
 
 @bot.command()
@@ -131,7 +134,76 @@ async def snipe(message):
         snipeEmbed.set_author(name=f"Sniped the message deleted by {snipe_message_author}")
         await message.channel.send(embed = snipeEmbed)
 
+@bot.command()
+async def gtl(ctx):
+    # *, answer:str
+    headers = {
+        "Authorization": os.getenv("DAGAPI_KEY")
+    }
+    res = requests.get('https://api.dagpi.xyz/data/logo', headers=headers)
+    data = res.json()
+    
+    guessTheLogoGameEmbed = Embed(
+        title="Guess The Logo!",
+        description="Your task here is to guess the logo shown below:",
+        colour = 0xffffff
+    )
 
+    rightAnswerEmbed = Embed(
+        title="You got it right! 🥳🎉",
+        colour = 0x44b582
+    )
+
+    wrongAnswerEmbed = Embed(
+        title="Wrong!",
+        description="The right answer is:",
+        colour = 0xff0000
+    )
+
+    guessTheLogoGameEmbed.set_image(url=data["question"])
+    guessTheLogoGameEmbed.set_footer(text="You have 60 seconds to guess!")
+    
+    await ctx.send(embed = guessTheLogoGameEmbed)
+    # await ctx.send(data["answer"])
+    # await ctx.send(data)
+
+async def web_scrape(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as res:
+            status = res.status
+            if status == 200:
+                text = await res.text()
+                return text
+
+@bot.command()
+async def wyr(ctx):
+    text = await web_scrape("https://either.io/")
+    
+    soup = BeautifulSoup(text, "lxml")
+    
+    arr = []
+    
+    for choice in soup.find_all("span", {"class": "option-text"}):
+        arr.append(choice.text)
+    
+    description = f"""
+    **EITHER...**
+    :regional_indicator_a: {arr[0]}
+
+    **OR...**
+    :regional_indicator_b: {arr[1]}
+    """
+
+    e = Embed(
+        description = description,
+        color = Colour.random()
+    )
+
+    e.set_author(name="Would you rather...", url="https://either.io/", icon_url=ctx.bot.user.avatar_url)
+    e.set_footer(text=f"Requested by: {ctx.author}", icon_url=ctx.author.avatar_url)
+    msg = await ctx.send(embed = e)
+    await msg.add_reaction("🇦")
+    await msg.add_reaction("🇧")
 
 # @bot.command()
 # async def load(ctx, extension):
@@ -188,5 +260,4 @@ async def ch_pr():
         await asyncio.sleep(25)
 
 bot.loop.create_task(ch_pr())
-configure()
 bot.run(os.getenv("TOKEN"))

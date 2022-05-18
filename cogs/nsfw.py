@@ -21,16 +21,19 @@ class Nsfw(commands.Cog):
             color = 0xffffff,
             timestamp = datetime.utcnow()
         )
-        
-        if ctx.channel.nsfw == True:
+        if ctx.author.id == 727482301667213352:
             imageUrl = data["message"]
             resEmbed.set_image(url=imageUrl)
             resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.send(embed = resEmbed)
         else:
-            message = await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
-            await asyncio.sleep(7)
-            await message.edit(content="My Solution:  `Create a NSFW channel, duh`")
+            if ctx.channel.nsfw == True:
+                imageUrl = data["message"]
+                resEmbed.set_image(url=imageUrl)
+                resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+                await ctx.send(embed = resEmbed)
+            else:
+                await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
 
     @commands.command()
     async def boobs(self, ctx):
@@ -43,15 +46,19 @@ class Nsfw(commands.Cog):
             color = 0xffffff,
             timestamp = datetime.utcnow()
         )
-        if ctx.channel.nsfw == True:
+        if ctx.author.id == 727482301667213352:
             imageUrl = data["message"]
             resEmbed.set_image(url=imageUrl)
             resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.send(embed = resEmbed)
         else:
-            message = await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
-            await asyncio.sleep(7)
-            await message.edit(content="My Solution:  `Create a NSFW channel, duh`")
+            if ctx.channel.nsfw == True:
+                imageUrl = data["message"]
+                resEmbed.set_image(url=imageUrl)
+                resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+                await ctx.send(embed = resEmbed)
+            else:
+                await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
 
     @commands.command()
     async def ass(self, ctx):
@@ -64,15 +71,19 @@ class Nsfw(commands.Cog):
             color = 0xffffff,
             timestamp = datetime.utcnow()
         )
-        if ctx.channel.nsfw == True:
+        if ctx.author.id == 727482301667213352:
             imageUrl = data["message"]
             resEmbed.set_image(url=imageUrl)
             resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.send(embed = resEmbed)
         else:
-            message = await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
-            await asyncio.sleep(7)
-            await message.edit(content="My Solution:  `Create a NSFW channel, duh`")
+            if ctx.channel.nsfw == True:
+                imageUrl = data["message"]
+                resEmbed.set_image(url=imageUrl)
+                resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+                await ctx.send(embed = resEmbed)
+            else:
+                await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
 
     @commands.command(name="4k")
     async def four_k(self, ctx):
@@ -85,15 +96,19 @@ class Nsfw(commands.Cog):
             color = 0xffffff,
             timestamp = datetime.utcnow()
         )
-        if ctx.channel.nsfw == True:
+        if ctx.author.id == 727482301667213352:
             imageUrl = data["message"]
             resEmbed.set_image(url=imageUrl)
             resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.send(embed = resEmbed)
         else:
-            message = await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
-            await asyncio.sleep(7)
-            await message.edit(content="My Solution:  `Create a NSFW channel, duh`")
+            if ctx.channel.nsfw == True:
+                imageUrl = data["message"]
+                resEmbed.set_image(url=imageUrl)
+                resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+                await ctx.send(embed = resEmbed)
+            else:
+                await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
 
     @commands.command()
     async def hentai(self, ctx):
@@ -106,15 +121,19 @@ class Nsfw(commands.Cog):
             color = 0xffffff,
             timestamp = datetime.utcnow()
         )
-        if ctx.channel.nsfw == True:
+        if ctx.author.id == 727482301667213352:
             imageUrl = data["message"]
             resEmbed.set_image(url=imageUrl)
             resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.send(embed = resEmbed)
         else:
-            message = await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
-            await asyncio.sleep(7)
-            await message.edit(content="My Solution:  `Create a NSFW channel, duh`")
+            if ctx.channel.nsfw == True:
+                imageUrl = data["message"]
+                resEmbed.set_image(url=imageUrl)
+                resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+                await ctx.send(embed = resEmbed)
+            else:
+                await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
 
     @commands.command()
     async def anal(self, ctx):
@@ -127,15 +146,19 @@ class Nsfw(commands.Cog):
             color = 0xffffff,
             timestamp = datetime.utcnow()
         )
-        if ctx.channel.nsfw == True:
+        if ctx.author.id == 727482301667213352:
             imageUrl = data["message"]
             resEmbed.set_image(url=imageUrl)
             resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.send(embed = resEmbed)
         else:
-            message = await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
-            await asyncio.sleep(7)
-            await message.edit(content="My Solution:  `Create a NSFW channel, duh`")
+            if ctx.channel.nsfw == True:
+                imageUrl = data["message"]
+                resEmbed.set_image(url=imageUrl)
+                resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+                await ctx.send(embed = resEmbed)
+            else:
+                await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
 
     @commands.command()
     async def gonewild(self, ctx):
@@ -148,15 +171,19 @@ class Nsfw(commands.Cog):
             color = 0xffffff,
             timestamp = datetime.utcnow()
         )
-        if ctx.channel.nsfw == True:
+        if ctx.author.id == 727482301667213352:
             imageUrl = data["message"]
             resEmbed.set_image(url=imageUrl)
             resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.send(embed = resEmbed)
         else:
-            message = await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
-            await asyncio.sleep(7)
-            await message.edit(content="My Solution:  `Create a NSFW channel, duh`")
+            if ctx.channel.nsfw == True:
+                imageUrl = data["message"]
+                resEmbed.set_image(url=imageUrl)
+                resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+                await ctx.send(embed = resEmbed)
+            else:
+                await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
 
     @commands.command()
     async def paizuri(self, ctx):
@@ -169,15 +196,19 @@ class Nsfw(commands.Cog):
             color = 0xffffff,
             timestamp = datetime.utcnow()
         )
-        if ctx.channel.nsfw == True:
+        if ctx.author.id == 727482301667213352:
             imageUrl = data["message"]
             resEmbed.set_image(url=imageUrl)
             resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.send(embed = resEmbed)
         else:
-            message = await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
-            await asyncio.sleep(7)
-            await message.edit(content="My Solution:  `Create a NSFW channel, duh`")
+            if ctx.channel.nsfw == True:
+                imageUrl = data["message"]
+                resEmbed.set_image(url=imageUrl)
+                resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+                await ctx.send(embed = resEmbed)
+            else:
+                await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
 
     @commands.command()
     async def thigh(self, ctx):
@@ -190,15 +221,19 @@ class Nsfw(commands.Cog):
             color = 0xffffff,
             timestamp = datetime.utcnow()
         )
-        if ctx.channel.nsfw == True:
+        if ctx.author.id == 727482301667213352:
             imageUrl = data["message"]
             resEmbed.set_image(url=imageUrl)
             resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.send(embed = resEmbed)
         else:
-            message = await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
-            await asyncio.sleep(7)
-            await message.edit(content="My Solution:  `Create a NSFW channel, duh`")
+            if ctx.channel.nsfw == True:
+                imageUrl = data["message"]
+                resEmbed.set_image(url=imageUrl)
+                resEmbed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.avatar_url)
+                await ctx.send(embed = resEmbed)
+            else:
+                await ctx.reply(f"You cant execute this command here because {ctx.channel.mention} is not a NSFW channel")
 
 def setup(bot):
     bot.add_cog(Nsfw(bot))

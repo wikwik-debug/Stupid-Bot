@@ -74,11 +74,11 @@ class Fun(Cog):
   
     user = ctx.author if not user else user
 
-    header = {
+    headers = {
       "Authorization": f"Bot {os.getenv('TOKEN')}"
     }
 
-    res = requests.get(f"https://discord.com/api/v9/users/{user.id}", headers=header)
+    res = requests.get(f"https://discord.com/api/v9/users/{user.id}", headers=headers)
     data = json.loads(res.text)
     
     pngLink = f"https://cdn.discordapp.com/avatars/{data['id']}/{data['avatar']}.png?size=1024"

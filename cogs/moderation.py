@@ -47,24 +47,51 @@ class Moderation(commands.Cog):
   #The unban command
   @commands.command()
   @commands.has_permissions(ban_members = True)
-  async def unban(self, ctx, user: User):
-    bannedUser = await self.bot.fetch_user(user.id)
-    await ctx.guild.unban(bannedUser)
+  async def unban(self, ctx, *users: User):
+    for user in users:
+      bannedUser = await self.bot.fetch_user(user.id)
+      await ctx.guild.unban(bannedUser)
     await ctx.message.add_reaction("<a:ApprovedCheckBox:882777440609521724>")
   
   #The clear command
   @commands.command()
   @commands.has_permissions(manage_messages = True)
   async def clear(self, ctx, amount: int):
-    if amount == "reset":
-      await ctx.channel.edit(slowmode_delay=0)
-      await ctx.send("The slomode have been turned off")
-    elif amount is None:
-      await ctx.reply("Please specify a value to slowmode")
+    if amount > 1000:
+      await ctx.send(f"Too many messages to search given ({amount}/1000)")
     else:
-      if isinstance(amount, str):
-        amount = int(amount)
-      await ctx.channel.purge(limit = amount)
+      countMembers = {}
+      
+      messages = await ctx.channel.history(limit=amount).flatten()
+      
+      for message in messages[1:]:
+        if str(message.author) in countMembers:
+          countMembers[str(message.author)] += 1
+        else:
+          countMembers[str(message.author)] = 1
+      
+      newString = []
+      
+      amountDeletedMessages = 0
+      
+      for author, deleted_message in list(countMembers.items()):
+        newString.append(f"**{author}**: {deleted_message}")
+        amountDeletedMessages += deleted_message
+      
+      finalString = "\n".join(newString)
+      
+      await ctx.channel.purge(limit=amount+1)
+      
+      if amountDeletedMessages == 1:
+        msg = await ctx.send(f"{amountDeletedMessages} message was removed.\n\n{finalString}")
+      elif amountDeletedMessages == 0:
+        msg = await ctx.send("No messages were deleted")
+      else:
+        msg = await ctx.send(f"{amountDeletedMessages} messages were removed.\n\n{finalString}")
+      
+      await asyncio.sleep(5)
+      
+      await msg.delete()
   
   #The nickname command
   @commands.command(aliases = ["changeNick"])
@@ -86,10 +113,18 @@ class Moderation(commands.Cog):
     #           await ctx.send(f'Nickname changed from ``{entries.changes.before.nick}`` to ``{entries.changes.after.nick}`` ')
     #         return
     
-    oldNickname = member.display_name
-    await member.edit(nick=nick)
-    newNickname = member.display_name
-    await ctx.send(f"Nickname changed from ``{oldNickname}`` to ``{newNickname}``")
+    app = await self.bot.application_info()
+
+    if ctx.author == app.owner:
+      oldNickname = member.display_name
+      await member.edit(nick=nick)
+      newNickname = member.display_name
+      await ctx.send(f"Nickname changed from ``{oldNickname}`` to ``{newNickname}``")
+    else:
+      oldNickname = member.display_name
+      await member.edit(nick=nick)
+      newNickname = member.display_name
+      await ctx.send(f"Nickname changed from ``{oldNickname}`` to ``{newNickname}``")
 
   class DurationConverter(commands.Converter):
     async def convert(self, ctx, args):
