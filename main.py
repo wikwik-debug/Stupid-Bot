@@ -16,8 +16,6 @@ import requests
 from datetime import datetime
 import aiohttp
 from bs4 import BeautifulSoup
-import dateutil.parser as dt
-import time
 
 from randomSentences import getRandomSentences
 
