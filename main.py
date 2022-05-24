@@ -203,6 +203,10 @@ async def wyr(ctx):
     await msg.add_reaction("🇦")
     await msg.add_reaction("🇧")
 
+@bot.commands()
+async def wow(ctx):
+    await ctx.send("Wow")
+
 # @bot.command()
 # async def load(ctx, extension):
 #   bot.load_extension(f"cogs.{extension}")
