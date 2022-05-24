@@ -17,7 +17,7 @@ from datetime import datetime
 import aiohttp
 from bs4 import BeautifulSoup
 
-from randomSentences import getRandomSentences
+from utils.randomSentences import getRandomSentences
 
 load_dotenv()
 
