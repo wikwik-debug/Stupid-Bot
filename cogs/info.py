@@ -10,7 +10,7 @@ import time
 import dateutil.parser as dt
 
 
-from weather import parse_data
+from utils.weather import parse_data
 
 class Info(commands.Cog):
   

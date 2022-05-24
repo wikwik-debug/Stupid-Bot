@@ -5,7 +5,7 @@ import io
 import contextlib
 from traceback import format_exception
 
-from utils import Pag, clean_code
+from utils.util import Pag, clean_code
 from main import bot
 
 class Miscellaneous(commands.Cog):
