@@ -15,12 +15,12 @@ class Utilities(commands.Cog):
   @commands.command(aliases = ["prefix"])
   @commands.has_permissions(administrator = True)
   async def changeprefix(self, ctx, prefix):
-    with open("prefixes.json", "r") as f:
+    with open("E:/Stupid-Bot/json/prefixes.json", "r") as f:
       prefixes = json.load(f)
 
     prefixes[f"{str(ctx.guild.name)}({str(ctx.guild.id)})"] = prefix
 
-    with open("prefixes.json", "w") as f:
+    with open("E:/Stupid-Bot/json/prefixes.json", "w") as f:
       json.dump(prefixes, f, indent = 4)
   
     await ctx.send(f'The prefix have been changed to ``{prefix}``')

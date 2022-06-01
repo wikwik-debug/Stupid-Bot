@@ -1,9 +1,6 @@
 from datetime import datetime
-from pydoc import describe
-from tokenize import group
 import discord
-from discord import Embed, Guild, Colour, Intents, Member, User, File
-from discord.ext import commands
+from discord import Embed, Guild, Colour, Intents, User, File
 from discord.ext.commands import Bot
 from discord.utils import snowflake_time
 
@@ -16,32 +13,28 @@ import requests
 from datetime import datetime
 import aiohttp
 from bs4 import BeautifulSoup
+import giphy_client
+from giphy_client.rest import ApiException
+from io import BytesIO
+from re import findall
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+import logging
 
 from utils.randomSentences import getRandomSentences
 
 load_dotenv()
 
 def get_prefix(bot, message):
-    with open("prefixes.json", "r") as f:
+    with open("./json/prefixes.json", "r") as f:
         prefixes = json.load(f)
     return prefixes[f"{str(message.guild.name)}({str(message.guild.id)})"]
 
 bot = Bot(command_prefix=get_prefix, intents=Intents.all(), case_insensitive=True, strip_after_prefix=True)
 bot.remove_command("help")
 
-snipe_message_content = None
-snipe_message_author = None
-
-@bot.event
-async def on_message_delete(message):
-    global snipe_message_content
-    global snipe_message_author
-
-    snipe_message_content = message.content
-    snipe_message_author = message.author.name
-    await asyncio.sleep(60)
-    snipe_message_content = None
-    snipe_message_author = None
 
 @bot.command()
 async def salatiga(ctx):
@@ -92,45 +85,6 @@ async def leave(ctx, guild: Guild = None):
 async def guildBanner(ctx, guild: Guild):
     fetchedGuild = await bot.fetch_guild(guild.id)
     await ctx.send(fetchedGuild.banner_url)
-
-@bot.command()
-async def iplookup(ctx, ipAddress:str = "9.9.9.9"):
-    res = requests.get(f"https://extreme-ip-lookup.com/json/{ipAddress}?key={os.getenv('IP_API')}")
-    data = res.json()
-    em = Embed()
-    fields = [
-        {"name": "IP", "value": data["query"]},
-        {"name": "IP Type", "value": data["ipType"]},
-        {"name": "Country", "value": data["country"]},
-        {"name": "City", "value": data["city"]},
-        {"name": "Continent", "value": data["continent"]},
-        {"name": "IP Name", "value": data["ipName"]},
-        {"name": "ISP", "value": data["isp"]},
-        {"name": "Latitute", "value": data["lat"]},
-        {"name": "Longitute", "value": data["lon"]},
-        {"name": "Organization", "value": data["org"]},
-        {"name": "Business", "value": data["businessName"]},
-        {"name": "Region", "value": data["region"]}
-    ]
-    for field in fields:
-        if field["value"]:
-            em.set_footer(text="\u200b")
-            em.timestamp = datetime.utcnow()
-            em.add_field(name=field["name"], value=field["value"], inline=True)
-    return await ctx.send(embed = em)
-
-@bot.command()
-async def snipe(message):
-    if snipe_message_content == None:
-        await message.channel.send("No message to snipe!")
-    else:
-        snipeEmbed = Embed(
-            description = f"{snipe_message_content}",
-            color = Colour.random()
-        )
-        snipeEmbed.set_footer(text=f"Requested by {message.author}")
-        snipeEmbed.set_author(name=f"Sniped the message deleted by {snipe_message_author}")
-        await message.channel.send(embed = snipeEmbed)
 
 @bot.command()
 async def gtl(ctx):
@@ -202,6 +156,83 @@ async def wyr(ctx):
     msg = await ctx.send(embed = e)
     await msg.add_reaction("🇦")
     await msg.add_reaction("🇧")
+
+@bot.command()
+async def gif(ctx, *, q:str = "smile"):
+    apiKey = os.environ.get("GIPHY_API_KEY")
+    apiInstance = giphy_client.DefaultApi()
+    try:
+        apiRes = apiInstance.gifs_search_get(apiKey, q)
+        ls = list(apiRes.data)
+        gif = random.choice(ls)
+        gifEmbed = Embed(title=q.title(), color = 0xffffff)
+        gifEmbed.set_image(url=f"https://media.giphy.com/media/{gif.id}/giphy.gif")
+        await ctx.send(embed = gifEmbed)
+    except ApiException:
+        print("An error has occured!")
+
+@bot.command()
+async def mosaic(ctx, pixels:int, imgType:str, picUrl:str):
+    headers = {
+        "Authorization": f"{os.environ.get('DAGAPI_KEY')}",
+        "Content-Type": f"image/{imgType}"
+    }
+
+    if pixels > 32:
+        await ctx.send("Too many pixels to render")
+
+    r = requests.get(f"https://api.dagpi.xyz/image/mosiac/?url={picUrl}&pixels={pixels}", headers=headers)
+
+    if findall(".webp", picUrl):
+        await ctx.send("Image type is not supported")
+    elif findall(".gif", picUrl):
+        if r.status_code == 200:
+            await ctx.send(file=File(BytesIO(r.content), "wanted.gif"))
+        elif r.status_code == 413:
+            errMsg = r.json()
+            await ctx.reply(errMsg["message"])
+    else:
+        if r.status_code == 200:
+            await ctx.send(file=File(BytesIO(r.content), "mosaic.png"))
+        elif r.status_code == 413:
+            errMsg = r.json()
+            await ctx.reply(errMsg["message"])
+        else:
+            print(r.text)
+            print(r.status_code)
+
+@bot.command()
+async def wanted(ctx, user:User = None):
+    finalUser = ctx.author if user is None else user
+    
+    headers = {
+        "Authorization": f"{os.environ.get('DAGAPI_KEY')}",
+        "Content-Type": "image/png"
+    }
+
+    r = requests.get(f"https://api.dagpi.xyz/image/wanted/?url={finalUser.avatar_url_as(format='png', size=4096)}", headers=headers)
+
+    if r.status_code == 200:
+        await ctx.send(file=File(BytesIO(r.content), "wanted.png"))
+    elif r.status_code == 413:
+        errMsg = r.json()
+        await ctx.reply(errMsg["message"])
+
+@bot.command()
+async def ss(ctx, url:str, delay:int = 1):
+    logging.getLogger('WDM').setLevel(logging.NOTSET)
+    
+    option = Options()
+    option.headless = True
+    option.add_argument("--window-size=1920,1080")
+    option.add_argument("--disable-gpu")
+    
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager(version="102.0.5005.61").install()), options=option)
+    driver.get(url)
+    await asyncio.sleep(10 * delay)
+    await ctx.send(file=File(BytesIO(driver.get_screenshot_as_png()), "webCapture.png"))
+
+
 
 # @bot.command()
 # async def load(ctx, extension):

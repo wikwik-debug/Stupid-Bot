@@ -1,5 +1,5 @@
 import asyncio
-from discord import Embed, AuditLogAction
+from discord import Embed, AuditLogAction, Status
 from discord.ext import commands
 from discord.ext.commands import Cog
 from discord.utils import find
@@ -17,33 +17,33 @@ class Events(Cog):
 
     @Cog.listener()
     async def on_message(self, message):
-        mentionForPC = f'<@!{self.bot.user.id}>'
-        mentionForMobile = f"<@881735007893336084>"
+        mentionForPC = f'<@{self.bot.user.id}>'
+        mentionForMobile = f"<@!{self.bot.user.id}>"
+
+        mentionHelpForPC = f'<@{self.bot.user.id}> help'
+        mentionHelpForMobile = f'<@!{self.bot.user.id}> help'
 
         if message.content == mentionForPC:
-            with open('prefixes.json', 'r') as f1:
+            with open('E:/Stupid-Bot/json/prefixes.json', 'r') as f1:
                 prefixes = json.load(f1) 
         
             serverPrefix = prefixes[f"{str(message.guild.name)}({str(message.guild.id)})"]
         
             await message.channel.send(f"My prefix for this server is `{serverPrefix}`")
-        
+
         # For mobile compatibility
         elif message.content == mentionForMobile:
-            with open('prefixes.json', 'r') as f2:
+            with open('E:/Stupid-Bot/json/prefixes.json', 'r') as f2:
                 prefixes = json.load(f2) 
         
             serverPrefix = prefixes[f"{str(message.guild.name)}({str(message.guild.id)})"]
         
             await message.channel.send(f"My prefix for this server is `{serverPrefix}`")
-    
-        elif message.content == "Noob":
-            await message.reply("Your the only noob on this planet")
-    
-        mentionHelpForPC = f'<@{self.bot.user.id}> help'
-        mentionHelpForMobile = f'<@!881735007893336084> help'
 
-        if message.content == mentionHelpForPC:
+        elif message.content == "Noob" or message.content == "noob":
+            await message.reply("Your the only noob on this planet")
+
+        elif message.content == mentionHelpForPC:
             embed1 = Embed(title = "My list of commands", colour = 0xffffff)
             embed1.add_field(name = "Moderation Commands", value = "``ban`` ``unban`` ``kick`` ``slowmode`` ``nickname`` ``mute`` ``unmute`` ``purge`` ``lock`` ``unlock`` ``channelban``", inline = False)
             embed1.add_field(name = "Info Commands", value = "``whois`` ``serverinfo`` ``botinfo`` ``covid`` ``emojiinfo`` ``numberinfo``", inline = False)
@@ -62,6 +62,9 @@ class Events(Cog):
             embed2.add_field(name = "Miscellaneous Commands", value = "``run``", inline = False)
             await message.channel.send(embed = embed2)
 
+        elif message.author == self.bot:
+            return
+
     @Cog.listener()
     async def on_command_error(self, ctx, error) -> None:
         if isinstance(error, commands.MissingPermissions):
@@ -78,21 +81,13 @@ class Events(Cog):
 
     @Cog.listener()
     async def on_guild_join(self, guild):
-        with open("prefixes.json", "r") as f:
+        with open("E:/Stupid-Bot/json/prefixes.json", "r") as f:
             prefixes = json.load(f)
 
         prefixes[f"{str(guild.name)}({str(guild.id)})"] = "sb!"
 
-        with open("prefixes.json", "w") as f:
+        with open("E:/Stupid-Bot/json/prefixes.json", "w") as f:
             json.dump(prefixes, f, indent = 4)
-        
-        post_url = "http://localhost:5000/utils/addNewPrefix"
-        payload = {
-            "serverID": guild.id,
-            "serverName": guild.name
-        }
-        res = requests.post(post_url, json=payload)
-        print(res.status_code)
 
         async for entries in guild.audit_logs(limit=1, action=AuditLogAction.bot_add):
             general = find(lambda x : x.name == 'general',  guild.text_channels)
@@ -107,12 +102,12 @@ class Events(Cog):
 
     @Cog.listener()
     async def on_guild_remove(self, guild):
-        with open("prefixes.json", "r") as f:
+        with open("E:/Stupid-Bot/json/prefixes.json", "r") as f:
             prefixes = json.load(f)
 
         prefixes.pop(f"{str(guild.name)}({str(guild.id)})")
 
-        with open("prefixes.json", "w") as f:
+        with open("E:/Stupid-Bot/json/prefixes.json", "w") as f:
             json.dump(prefixes, f, indent = 4)
 
 def setup(bot):
